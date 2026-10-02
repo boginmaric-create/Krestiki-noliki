@@ -37,6 +37,14 @@ namespace TicTacToe
                     break;
                 }
 
+                if (CheckDraw())
+                {
+                    Console.Clear();
+                    DrawBoard();
+                    Console.WriteLine("Ничья! Свободных клеток не осталось.");
+                    break;
+                }
+
                 currentPlayer = (currentPlayer == 1) ? 2 : 1;
             }
         }
@@ -57,6 +65,16 @@ namespace TicTacToe
                     return true;
             }
             return false;
+        }
+
+        static bool CheckDraw()
+        {
+            foreach (char cell in board)
+            {
+                if (cell != 'X' && cell != 'O')
+                    return false;
+            }
+            return true;
         }
 
         static void DrawBoard()
