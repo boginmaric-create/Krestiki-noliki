@@ -22,14 +22,41 @@ namespace TicTacToe
 
                 if (!int.TryParse(input, out int choice) || choice < 1 || choice > 9 || board[choice - 1] == 'X' || board[choice - 1] == 'O')
                 {
-                    Console.WriteLine("Некорректный ввод! Нажмите Enter...");
+                    Console.WriteLine("Ошибка ввода! Нажмите Enter...");
                     Console.ReadLine();
                     continue;
                 }
 
                 board[choice - 1] = currentSymbol;
+
+                if (CheckWin())
+                {
+                    Console.Clear();
+                    DrawBoard();
+                    Console.WriteLine($"Игрок {currentPlayer} ({currentSymbol}) Победил!");
+                    break;
+                }
+
                 currentPlayer = (currentPlayer == 1) ? 2 : 1;
             }
+        }
+
+        static bool CheckWin()
+        {
+            int[,] winPatterns = new int[,]
+            {
+                {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
+                {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
+                {0, 4, 8}, {2, 4, 6}
+            };
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (board[winPatterns[i, 0]] == board[winPatterns[i, 1]] &&
+                    board[winPatterns[i, 1]] == board[winPatterns[i, 2]])
+                    return true;
+            }
+            return false;
         }
 
         static void DrawBoard()
