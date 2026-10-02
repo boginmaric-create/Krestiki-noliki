@@ -5,26 +5,31 @@ namespace TicTacToe
     class Program
     {
         static char[] board = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        static int currentPlayer = 1;
 
         static void Main(string[] args)
         {
-            DrawBoard();
-            Console.Write("Выберите номер клетки (1-9): ");
-            string input = Console.ReadLine();
-
-            if (!int.TryParse(input, out int choice) || choice < 1 || choice > 9)
+            while (true)
             {
-                Console.WriteLine("Ошибка: Введен некорректный символ!");
-                return;
-            }
+                Console.Clear();
+                DrawBoard();
 
-            if (board[choice - 1] == 'X' || board[choice - 1] == 'O')
-            {
-                Console.WriteLine("Ошибка: Эта клетка уже занята!");
-                return;
-            }
+                char currentSymbol = (currentPlayer == 1) ? 'X' : 'O';
+                Console.WriteLine($"Ход игрока {currentPlayer} ({currentSymbol})");
+                Console.Write("Выберите номер клетки (1-9): ");
 
-            Console.WriteLine($"Ход принят в клетку {choice}");
+                string input = Console.ReadLine();
+
+                if (!int.TryParse(input, out int choice) || choice < 1 || choice > 9 || board[choice - 1] == 'X' || board[choice - 1] == 'O')
+                {
+                    Console.WriteLine("Некорректный ввод! Нажмите Enter...");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                board[choice - 1] = currentSymbol;
+                currentPlayer = (currentPlayer == 1) ? 2 : 1;
+            }
         }
 
         static void DrawBoard()
