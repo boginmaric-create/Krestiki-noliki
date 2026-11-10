@@ -9,6 +9,43 @@ namespace TicTacToe
 
         static void Main(string[] args)
         {
+            do
+            {
+                ResetGame();
+                PlayGame();
+            }
+            while (AskRestart());
+
+            Console.WriteLine("Спасибо за игру!");
+        }
+
+        static void ResetGame()
+        {
+            board = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            currentPlayer = 1;
+        }
+
+        static bool AskRestart()
+        {
+            while (true)
+            {
+                Console.Write("Сыграть ещё раз? (y/n): ");
+                string answer = Console.ReadLine();
+                if (answer == null)
+                    return false;
+                answer = answer.Trim().ToLower();
+
+                if (answer == "y" || answer == "д")
+                    return true;
+                if (answer == "n" || answer == "н")
+                    return false;
+
+                Console.WriteLine("Введите y (да) или n (нет).");
+            }
+        }
+
+        static void PlayGame()
+        {
             while (true)
             {
                 Console.Clear();
