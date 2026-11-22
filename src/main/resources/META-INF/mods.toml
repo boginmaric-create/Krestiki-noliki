@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="edgerunners"
+version="1.0.0"
+displayName="Edgerunners: Cyberware"
+description='''
+Fan-made cyberware mod inspired by Cyberpunk: Edgerunners.
+Sandevistan, monowire, Kiroshi optics, reinforced tendons, gorilla arms, mantis blades and cyberpsychosis.
+Unofficial fan work, not affiliated with CD PROJEKT RED or Studio Trigger.
+'''
+
+[[dependencies.edgerunners]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.edgerunners]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"

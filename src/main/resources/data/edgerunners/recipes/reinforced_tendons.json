@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["CSC","LRL","CSC"], "key": {"C": {"item": "edgerunners:cyber_chip"}, "S": {"item":"minecraft:slime_ball"}, "L": {"item":"minecraft:leather"}, "R": {"item":"minecraft:rabbit_foot"}}, "result": { "item": "edgerunners:reinforced_tendons", "count": 1 } }

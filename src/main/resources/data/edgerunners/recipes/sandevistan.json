@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["CDC","EKE","CDC"], "key": {"C": {"item": "edgerunners:cyber_chip"}, "D": {"item":"minecraft:diamond"}, "E": {"item":"minecraft:ender_pearl"}, "K": {"item":"minecraft:clock"}}, "result": { "item": "edgerunners:sandevistan", "count": 1 } }

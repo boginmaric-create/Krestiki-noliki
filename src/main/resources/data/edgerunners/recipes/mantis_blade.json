@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["  I"," D ","C  "], "key": {"C": {"item": "edgerunners:cyber_chip"}, "I": {"item":"minecraft:iron_ingot"}, "D": {"item":"minecraft:diamond"}}, "result": { "item": "edgerunners:mantis_blade", "count": 1 } }

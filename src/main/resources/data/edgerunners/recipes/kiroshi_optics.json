@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["CGC","GEG","CGC"], "key": {"C": {"item": "edgerunners:cyber_chip"}, "G": {"item":"minecraft:glass"}, "E": {"item":"minecraft:ender_eye"}}, "result": { "item": "edgerunners:kiroshi_optics", "count": 1 } }

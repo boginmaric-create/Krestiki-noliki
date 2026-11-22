@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["CSC","SDS","CSC"], "key": {"C": {"item": "edgerunners:cyber_chip"}, "S": {"item":"minecraft:string"}, "D": {"item":"minecraft:diamond"}}, "result": { "item": "edgerunners:monowire", "count": 1 } }

@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "equipment", "pattern": ["ISI","ICI","LLL"], "key": {"C": {"item": "edgerunners:cyber_chip"}, "I": {"item":"minecraft:iron_ingot"}, "S": {"item":"minecraft:shears"}, "L": {"item":"minecraft:leather"}}, "result": { "item": "edgerunners:ripperdoc_kit", "count": 1 } }
