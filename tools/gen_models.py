@@ -125,6 +125,29 @@ for i in (4.5, 6.5, 8.5, 10.5):
           box([1.5, 0, i], [3, 0.6, i + 1], GOLD), box([13, 0, i], [14.5, 0.6, i + 1], GOLD)]
 M['cyber_chip'] = c
 
+def rot(e, angle, origin=(8, 8, 12), axis='x'):
+    e['rotation'] = {"origin": list(origin), "axis": axis, "angle": angle}
+    return e
+
+# Ripperdoc chair (block). Seat faces north (-Z); backrest leans toward south (+Z).
+CHAIR = [
+    box([5, 0, 5], [11, 2, 11], DARK), box([4.8, 1, 4.8], [11.2, 1.5, 11.2], YELLOW, True),
+    box([6.5, 2, 6.5], [9.5, 6, 9.5], STEEL),
+    box([2, 6, 1], [14, 8, 12], STEEL), box([2.5, 8, 1.5], [13.5, 9, 11.5], BLACK),
+    box([1.9, 6.5, 1], [2, 7.5, 12], CYAN, True), box([14, 6.5, 1], [14.1, 7.5, 12], CYAN, True),
+    rot(box([2.5, 8, 12], [13.5, 22, 14], STEEL), 22.5), rot(box([3, 9, 11.4], [13, 21, 12], BLACK), 22.5),
+    rot(box([5, 21, 12.3], [11, 24, 14.3], GRAY), 22.5),
+    box([1, 8, 3], [2.5, 10, 11], LIGHT), box([13.5, 8, 3], [15, 10, 11], LIGHT),
+    box([1.2, 6, 9], [2.3, 8, 10], GRAY), box([13.7, 6, 9], [14.8, 8, 10], GRAY),
+    # surgical arm
+    box([14, 0, 13.5], [15.5, 21, 15], GRAY), box([13.8, 2, 13.3], [15.7, 3, 15.2], YELLOW),
+    box([13.6, 20, 3], [15, 21.5, 15], LIGHT),
+    box([10, 17, 3], [15, 20, 7], DARK),
+    box([10.5, 16.5, 3.5], [11.5, 17, 4.5], PINK, True), box([12, 16.5, 3.5], [13, 17, 4.5], GREEN, True),
+    box([13.5, 16.5, 3.5], [14.5, 17, 4.5], CYAN, True),
+    box([11, 14.5, 5], [11.4, 17, 5.4], WHITE), box([13, 15, 5.5], [13.4, 17, 5.9], WHITE),
+]
+
 if __name__ == '__main__':
     img = Image.new('RGBA', (16, 16))
     for i, col in enumerate(PALETTE):
@@ -149,4 +172,17 @@ if __name__ == '__main__':
                    "perspectives": {"gui": {"parent": flat, "textures": {"layer0": f"edgerunners:item/{name}"}}}}
         with open(f'{ROOT}/models/item/{name}.json', 'w') as f:
             json.dump(wrapper, f, indent=1)
-    print('generated', len(M), 'models')
+    chair = {"parent": "minecraft:block/block",
+             "textures": {"palette": "edgerunners:item/palette", "particle": "edgerunners:item/palette"},
+             "elements": CHAIR}
+    os.makedirs(f'{ROOT}/models/block', exist_ok=True)
+    os.makedirs(f'{ROOT}/blockstates', exist_ok=True)
+    with open(f'{ROOT}/models/block/ripperdoc_chair.json', 'w') as f:
+        json.dump(chair, f, indent=1)
+    with open(f'{ROOT}/models/item/ripperdoc_chair.json', 'w') as f:
+        json.dump({"parent": "edgerunners:block/ripperdoc_chair"}, f, indent=1)
+    variants = {f"facing={d}": {"model": "edgerunners:block/ripperdoc_chair", **({"y": y} if y else {})}
+                for d, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}
+    with open(f'{ROOT}/blockstates/ripperdoc_chair.json', 'w') as f:
+        json.dump({"variants": variants}, f, indent=1)
+    print('generated', len(M), 'item models + ripperdoc chair')

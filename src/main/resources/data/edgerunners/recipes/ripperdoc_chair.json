@@ -1,0 +1,1 @@
+{ "type": "minecraft:crafting_shaped", "category": "misc", "pattern": ["CR ","LLL","I I"], "key": { "C": {"item":"edgerunners:cyber_chip"}, "R": {"item":"minecraft:redstone"}, "L": {"item":"minecraft:leather"}, "I": {"item":"minecraft:iron_ingot"} }, "result": { "item": "edgerunners:ripperdoc_chair", "count": 1 } }

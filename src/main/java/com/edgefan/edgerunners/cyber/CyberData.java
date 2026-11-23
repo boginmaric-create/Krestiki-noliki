@@ -36,6 +36,8 @@ public final class CyberData {
 
     public static void install(Player p, Cyberware c) { tag(p).putInt(IMPLANTS, implants(p) | c.bit()); }
 
+    public static void uninstall(Player p, Cyberware c) { tag(p).putInt(IMPLANTS, implants(p) & ~c.bit()); }
+
     public static void clearImplants(Player p) { tag(p).putInt(IMPLANTS, 0); }
 
     public static int totalLoad(int mask) {
