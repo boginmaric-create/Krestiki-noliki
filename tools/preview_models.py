@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 ATLAS = Image.open('src/main/resources/assets/edgerunners/textures/item/cyberware.png').convert('RGBA')
+CHROME = Image.open('src/main/resources/assets/edgerunners/textures/item/chrome.png').convert('RGBA')
 S = 300
 
 def coeffs(dst, src):
@@ -49,16 +50,16 @@ def render(path, yaw=-35, pitch=25, sc=None):
         for d, q in quads.items():
             q = rotate_pts(q, e.get('rotation'))
             pts = [P(*p) for p in q]
-            faces.append((sum(p[2] for p in pts) / 4, pts, e['faces'][d]['uv'], 1.0 if e.get('shade') is False else light[d]))
+            faces.append((sum(p[2] for p in pts) / 4, pts, e['faces'][d]['uv'], 1.0 if e.get('shade') is False else light[d], e['faces'][d]['texture']))
     img = Image.new('RGBA', (S, S), (30, 31, 40, 255))
     k = ATLAS.width / 16
-    for _, pts, uv, sh in sorted(faces, key=lambda f: f[0]):
+    for _, pts, uv, sh, texkey in sorted(faces, key=lambda f: f[0]):
         u0, v0, u1, v1 = [c * k for c in uv]
         src = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
         dst = [(p[0], p[1]) for p in pts]
         try: cf = coeffs(dst, src)
         except np.linalg.LinAlgError: continue
-        tex = ATLAS.transform((S, S), Image.PERSPECTIVE, cf, Image.BILINEAR)
+        tex = (CHROME if texkey == '#chrome' else ATLAS).transform((S, S), Image.PERSPECTIVE, cf, Image.BILINEAR)
         if sh < 1: tex = Image.blend(Image.new('RGBA', (S, S), (0, 0, 0, 255)), tex, sh)
         mask = Image.new('L', (S, S)); ImageDraw.Draw(mask).polygon(dst, fill=255)
         img.paste(tex, (0, 0), mask)

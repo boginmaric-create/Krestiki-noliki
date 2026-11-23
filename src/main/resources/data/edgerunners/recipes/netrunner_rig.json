@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "GCG",
+  "EAE",
+  "GCG"
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "E": {
+   "item": "minecraft:ender_eye"
+  },
+  "A": {
+   "item": "minecraft:amethyst_shard"
+  }
+ },
+ "result": {
+  "item": "edgerunners:netrunner_rig",
+  "count": 1
+ }
+}

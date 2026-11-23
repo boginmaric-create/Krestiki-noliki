@@ -2,7 +2,7 @@ package com.edgefan.edgerunners.cyber;
 
 /** Body slots a ripperdoc can fill. Each slot holds one implant. */
 public enum CyberSlot {
-    OPERATING_SYSTEM("os"), EYES("eyes"), ARMS("arms"), LEGS("legs");
+    OPERATING_SYSTEM("os"), EYES("eyes"), ARMS("arms"), LEGS("legs"), CHROME("chrome");
 
     public final String id;
 

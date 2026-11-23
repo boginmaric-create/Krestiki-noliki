@@ -63,7 +63,7 @@ public final class Abilities {
             return;
         }
         CyberData.set(p, CyberData.SANDE, CyberData.SANDE_DURATION);
-        CyberData.set(p, CyberData.SANDE_CD, CyberData.SANDE_COOLDOWN);
+        CyberData.set(p, CyberData.SANDE_CD, ChromeBonuses.cooldown(p, CyberData.SANDE_COOLDOWN));
         CyberData.addPsychosis(p, 6);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1f, 2f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1f, 0.6f);
@@ -130,7 +130,7 @@ public final class Abilities {
             return;
         }
         if (CyberData.get(p, CyberData.MONO_CD) > 0) return;
-        CyberData.set(p, CyberData.MONO_CD, CyberData.MONO_COOLDOWN);
+        CyberData.set(p, CyberData.MONO_CD, ChromeBonuses.cooldown(p, CyberData.MONO_COOLDOWN));
         CyberData.addPsychosis(p, 1.5f);
 
         ServerLevel level = p.serverLevel();
@@ -170,7 +170,7 @@ public final class Abilities {
             bar(p, "msg.edgerunners.cooldown", ChatFormatting.RED, cd / 20 + 1);
             return;
         }
-        CyberData.set(p, CyberData.SCAN_CD, CyberData.SCAN_COOLDOWN);
+        CyberData.set(p, CyberData.SCAN_CD, ChromeBonuses.cooldown(p, CyberData.SCAN_COOLDOWN));
         List<LivingEntity> found = p.serverLevel().getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(40), e -> e != p && e.isAlive());
         for (LivingEntity e : found) e.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0, false, false));
         p.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 400, 0, false, false, true));

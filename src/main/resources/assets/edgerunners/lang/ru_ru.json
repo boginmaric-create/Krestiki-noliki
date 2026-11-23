@@ -61,5 +61,14 @@
   "tooltip.edgerunners.slot": "Слот: %s",
   "msg.edgerunners.need_ripperdoc": "Импланты ставит риппердок — используйте кресло риппердока",
   "msg.edgerunners.removed": "Извлечено: %s",
-  "effect.edgerunners.bleeding": "Кровотечение"
+  "effect.edgerunners.bleeding": "Кровотечение",
+  "item.edgerunners.street_samurai": "Хром: Уличный самурай",
+  "item.edgerunners.street_samurai.desc": "Броня предплечий с выкидными лезвиями — раскрываются в бою. +2 к урону, быстрее атаки.",
+  "item.edgerunners.netrunner_rig": "Хром: Нетраннер",
+  "item.edgerunners.netrunner_rig.desc": "Нейро-обруч, порты на висках и кибердека с качающимися кабелями. Способности перезаряжаются на 40% быстрее.",
+  "item.edgerunners.heavy_borg": "Хром: Тяжёлый борг",
+  "item.edgerunners.heavy_borg.desc": "Тяжёлая броня, реактор на груди, выхлопные заслонки раскрываются при беге. +6 брони, устойчивость к отбрасыванию, чуть медленнее.",
+  "item.edgerunners.merc_arms": "Хром: Наёмница",
+  "item.edgerunners.merc_arms.desc": "Полные кибер-руки с вращающимся ротором на запястье и пальцами на сервоприводах. +10% к скорости, +1 к урону, +2 сердца.",
+  "gui.edgerunners.slot.chrome": "Внешний хром"
 }

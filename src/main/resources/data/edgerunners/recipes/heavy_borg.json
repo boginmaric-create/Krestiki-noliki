@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "NRN",
+  "CBC",
+  "NRN"
+ ],
+ "key": {
+  "N": {
+   "item": "minecraft:netherite_scrap"
+  },
+  "R": {
+   "item": "minecraft:redstone_block"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "B": {
+   "item": "minecraft:iron_block"
+  }
+ },
+ "result": {
+  "item": "edgerunners:heavy_borg",
+  "count": 1
+ }
+}

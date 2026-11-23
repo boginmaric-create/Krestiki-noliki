@@ -10,7 +10,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import com.edgefan.edgerunners.client.chrome.ChromeModel;
+import com.edgefan.edgerunners.client.chrome.ChromeRenderer;
+import com.edgefan.edgerunners.client.chrome.ChromeState;
 import com.edgefan.edgerunners.client.fx.FxManager;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -29,6 +38,33 @@ public final class ClientForgeEvents {
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut e) {
         ClientCyberData.VISIBLE.clear();
         FxManager.clear();
+        ChromeState.clear();
+        ChromeRenderer.clearCache();
+    }
+
+    /** First person: draw the external chrome on the visible arm. */
+    @SubscribeEvent
+    public static void onRenderArm(RenderArmEvent e) {
+        AbstractClientPlayer p = e.getPlayer();
+        Integer data = ClientCyberData.VISIBLE.get(p.getId());
+        if (data == null) return;
+        Cyberware set = ChromeRenderer.installedSet(data);
+        if (set == null) return;
+        ChromeModel model = ChromeRenderer.model(set);
+        if (model == null) return;
+        if (!(Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(p) instanceof PlayerRenderer pr)) return;
+        PlayerModel<AbstractClientPlayer> m = pr.getModel();
+        // mirror what PlayerRenderer.renderHand does right after this event, so our cubes line up with the arm
+        m.attackTime = 0f;
+        m.crouching = false;
+        m.swimAmount = 0f;
+        m.setupAnim(p, 0f, 0f, 0f, 0f, 0f);
+        boolean right = e.getArm() == HumanoidArm.RIGHT;
+        ModelPart arm = right ? m.rightArm : m.leftArm;
+        arm.xRot = 0f;
+        float partial = Minecraft.getInstance().getFrameTime();
+        ChromeRenderer.renderArm(e.getPoseStack(), e.getMultiBufferSource(), e.getPackedLight(), arm,
+                right ? "right_arm" : "left_arm", model, ChromeRenderer.Signals.of(p, partial, 0f, 0f), "slim".equals(p.getModelName()));
     }
 
     @SubscribeEvent
@@ -54,6 +90,7 @@ public final class ClientForgeEvents {
         LocalPlayer p = mc.player;
         if (p == null) return;
         FxManager.tick(mc);
+        ChromeState.tick(mc);
 
         while (KeyBinds.SANDEVISTAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SANDEVISTAN));
         while (KeyBinds.MONOWIRE.consumeClick()) {

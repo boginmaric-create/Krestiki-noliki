@@ -25,8 +25,8 @@ public class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu> {
     public RipperdocScreen(RipperdocMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         imageWidth = 176;
-        imageHeight = 222;
-        inventoryLabelY = 129;
+        imageHeight = 240;
+        inventoryLabelY = 147;
     }
 
     @Override

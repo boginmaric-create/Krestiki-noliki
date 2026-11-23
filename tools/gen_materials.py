@@ -135,3 +135,99 @@ def build(path):
 if __name__ == '__main__':
     build('src/main/resources/assets/edgerunners/textures/item/cyberware.png')
     print('atlas ok')
+
+
+# ---------------------------------------------------------------- chrome atlas (external chrome sets)
+def hexes(img, size=8, line=(14, 14, 18), hi=(70, 72, 84)):
+    d = ImageDraw.Draw(img)
+    h = size * math.sqrt(3) / 2
+    for row in range(-1, int(T / h) + 2):
+        for col in range(-1, int(T / (size * 1.5)) + 2):
+            cx = col * size * 1.5; cy = row * h * 2 + (h if col % 2 else 0)
+            pts = [(cx + size * math.cos(math.radians(a)), cy + size * math.sin(math.radians(a))) for a in range(0, 360, 60)]
+            d.polygon(pts, outline=line)
+            d.line(pts[4:6], fill=hi)
+    return img
+
+def anodized(color):
+    a = brushed(color) * 0.9
+    a += np.linspace(18, -22, T)[:, None, None]
+    img = to_img(a)
+    d = ImageDraw.Draw(img)
+    d.line([(0, 20), (T, 20)], fill=tuple(int(c * 0.45) for c in color)); d.line([(0, 21), (T, 21)], fill=tuple(min(255, int(c * 1.4)) for c in color))
+    return img
+
+import math
+chrome_tiles = []
+# 0 matte black armour with hex pattern
+chrome_tiles.append(hexes(to_img(base((34, 35, 42), 4) + np.linspace(14, -10, T)[:, None, None])))
+# 1 gunmetal panels
+chrome_tiles.append(panel_lines(to_img(brushed((88, 92, 102))), 32, rivets=True))
+# 2 anodised teal, 3 anodised purple
+chrome_tiles.append(anodized((40, 170, 160)))
+chrome_tiles.append(anodized((120, 60, 190)))
+# 4 white composite
+a = base((226, 228, 232), 3) + np.linspace(16, -20, T)[:, None, None]
+img = to_img(a); d = ImageDraw.Draw(img)
+for y in (16, 48): d.line([(0, y), (T, y)], fill=(160, 164, 172))
+d.line([(32, 0), (32, 16)], fill=(160, 164, 172))
+chrome_tiles.append(img)
+# 5 copper
+chrome_tiles.append(to_img(brushed((184, 104, 62))))
+# 6 glow orange, 7 glow purple, 8 glow ice-blue
+for col in ((255, 120, 20), (170, 60, 255), (150, 220, 255)):
+    chrome_tiles.append(to_img(glow(col)))
+# 9 heat vent: dark slats with hot glow between them
+a = np.zeros((T, T, 3)) + (20, 18, 18)
+yy, xx = np.mgrid[0:T, 0:T]
+slot = (yy % 8) < 3
+heat = np.clip(1 - np.abs(xx - T / 2) / (T / 2), 0, 1) ** 0.6
+a[slot] = (np.array([255, 110, 20]) * (0.55 + 0.45 * heat[slot][:, None]))
+a[~slot] += np.linspace(30, 0, T)[:, None, None].repeat(T, 1)[~slot]
+chrome_tiles.append(to_img(a))
+# 10 braided cable
+a = np.zeros((T, T, 3)) + 26
+braid = (np.sin((xx + yy) * 0.8) * np.sin((xx - yy) * 0.8))
+a += (braid * 26)[..., None] + np.array([6, 4, 14])
+chrome_tiles.append(to_img(a + noise(4)[..., None]))
+# 11 red armour (worn paint)
+a = base((168, 22, 30), 5) + np.linspace(20, -24, T)[:, None, None]
+wear = noise(1, 2) > 0.22
+a[wear] = (96, 98, 106)
+img = to_img(a + noise(3)[..., None]); panel_lines(img, 64, rivets=True)
+chrome_tiles.append(img)
+# 12 exposed servo / mechanical detail
+img = to_img(base((60, 62, 70), 6)); d = ImageDraw.Draw(img)
+for cx, cy, r in ((16, 16, 11), (46, 18, 8), (22, 46, 9), (48, 48, 12)):
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(120, 124, 134), outline=(20, 20, 26))
+    d.ellipse([cx - r / 2.5, cy - r / 2.5, cx + r / 2.5, cy + r / 2.5], fill=(40, 42, 50))
+    for k in range(8):
+        ang = k * math.pi / 4
+        d.line([(cx + math.cos(ang) * r * 0.5, cy + math.sin(ang) * r * 0.5), (cx + math.cos(ang) * r, cy + math.sin(ang) * r)], fill=(80, 82, 92))
+d.line([(0, 32), (T, 32)], fill=(200, 160, 40), width=2)
+chrome_tiles.append(img)
+# 13 dark chrome
+band = 70 + 70 * np.sin(np.linspace(0, 1, T)[:, None] * 8) ** 2
+chrome_tiles.append(to_img(np.repeat(band, T, 1)[..., None] * np.array([0.9, 0.95, 1.08]) + noise(3)[..., None]))
+# 14 neon circuit (emissive)
+img = to_img(base((16, 10, 30), 3)); d = ImageDraw.Draw(img)
+for i in range(16):
+    x, y = (int(v) for v in rng.integers(2, T - 2, 2)); L = int(rng.integers(8, 26))
+    col = (210, 120, 255) if i % 2 else (120, 230, 255)
+    if i % 3: d.line([(x, y), (min(T - 1, x + L), y), (min(T - 1, x + L + 5), min(T - 1, y + 5))], fill=col, width=2)
+    else: d.line([(x, y), (x, min(T - 1, y + L))], fill=col, width=2)
+    d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 255, 255))
+chrome_tiles.append(img)
+# 15 tinted visor glass
+yy2, xx2 = np.mgrid[0:T, 0:T] / (T - 1)
+a = np.zeros((T, T, 3)) + (60, 10, 40)
+a += ((1 - yy2) * 90)[..., None] * np.array([1.0, 0.3, 0.6])
+a += (np.exp(-((xx2 - 0.3) ** 2 + (yy2 - 0.25) ** 2) / 0.01) * 200)[..., None]
+chrome_tiles.append(to_img(a))
+
+
+def build_chrome(path):
+    atlas = Image.new('RGBA', (T * 4, T * 4))
+    for i, t in enumerate(chrome_tiles):
+        atlas.paste(t.convert('RGBA'), ((i % 4) * T, (i // 4) * T))
+    atlas.save(path)

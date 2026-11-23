@@ -61,5 +61,14 @@
   "tooltip.edgerunners.slot": "Slot: %s",
   "msg.edgerunners.need_ripperdoc": "Cyberware is installed by a ripperdoc - use a Ripperdoc Chair",
   "msg.edgerunners.removed": "Removed: %s",
-  "effect.edgerunners.bleeding": "Bleeding"
+  "effect.edgerunners.bleeding": "Bleeding",
+  "item.edgerunners.street_samurai": "Chrome Set: Street Samurai",
+  "item.edgerunners.street_samurai.desc": "Forearm armour with retractable arm blades that deploy in combat. +2 attack damage, faster attacks.",
+  "item.edgerunners.netrunner_rig": "Chrome Set: Netrunner Rig",
+  "item.edgerunners.netrunner_rig.desc": "Neural circlet, temple ports and a cyberdeck with swaying data cables. Abilities recharge 40% faster.",
+  "item.edgerunners.heavy_borg": "Chrome Set: Heavy Borg",
+  "item.edgerunners.heavy_borg.desc": "Heavy armour plating, chest reactor and back exhausts that open when sprinting. +6 armour, knockback resistance, slightly slower.",
+  "item.edgerunners.merc_arms": "Chrome Set: Mercenary Arms",
+  "item.edgerunners.merc_arms.desc": "Full anodised cyber-arms with a spinning wrist rotor and servo fingers. +10% speed, +1 damage, +2 hearts.",
+  "gui.edgerunners.slot.chrome": "External chrome"
 }

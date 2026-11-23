@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "IBI",
+  "CNC",
+  "IBI"
+ ],
+ "key": {
+  "I": {
+   "item": "minecraft:netherite_scrap"
+  },
+  "B": {
+   "item": "edgerunners:mantis_blade"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "N": {
+   "item": "minecraft:blaze_rod"
+  }
+ },
+ "result": {
+  "item": "edgerunners:street_samurai",
+  "count": 1
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "DCD",
+  "PIP",
+  "DCD"
+ ],
+ "key": {
+  "D": {
+   "item": "minecraft:diamond"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "P": {
+   "item": "minecraft:piston"
+  },
+  "I": {
+   "item": "minecraft:iron_block"
+  }
+ },
+ "result": {
+  "item": "edgerunners:merc_arms",
+  "count": 1
+ }
+}

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(EdgerunnersMod.MODID)
 public class EdgerunnersMod {
     public static final String MODID = "edgerunners";
+    public static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
 
     public EdgerunnersMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();

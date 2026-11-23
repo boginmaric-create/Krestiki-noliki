@@ -55,6 +55,7 @@ public final class CyberEvents {
         }
 
         tickPsychosis(p);
+        if (p.tickCount % 20 == 0) ChromeBonuses.sync(p);
 
         if (p.tickCount % 4 == 0) Network.toPlayer(p, SyncPacket.of(p));
         // Let everyone nearby see this player's chrome (cheap: one small packet per second, or on state change).

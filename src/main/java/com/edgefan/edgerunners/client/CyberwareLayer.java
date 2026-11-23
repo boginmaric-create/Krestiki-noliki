@@ -1,6 +1,8 @@
 package com.edgefan.edgerunners.client;
 
 import com.edgefan.edgerunners.EdgerunnersMod;
+import com.edgefan.edgerunners.client.chrome.ChromeModel;
+import com.edgefan.edgerunners.client.chrome.ChromeRenderer;
 import com.edgefan.edgerunners.cyber.Cyberware;
 import com.edgefan.edgerunners.network.ClientCyberData;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -43,6 +45,13 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         if (player.isInvisible()) return;
         Integer data = ClientCyberData.VISIBLE.get(player.getId());
         if (data == null || (data & ~ClientCyberData.SANDE_ACTIVE_BIT) == 0) return;
+        Cyberware set = ChromeRenderer.installedSet(data);
+        if (set != null) {
+            ChromeModel model = ChromeRenderer.model(set);
+            if (model != null)
+                ChromeRenderer.renderAll(pose, buffers, light, getParentModel(), model,
+                        ChromeRenderer.Signals.of(player, partialTick, limbSwing, limbSwingAmount), slim);
+        }
         boolean sandeActive = (data & ClientCyberData.SANDE_ACTIVE_BIT) != 0;
         PlayerModel<AbstractClientPlayer> m = getParentModel();
         float w = slim ? 3f : 4f;
@@ -158,7 +167,13 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
 
     private static void cubeA(Part p, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
                               int mat, float bright, int light) {
-        PoseStack.Pose last = p.pose().last();
+        drawBox(p.pose(), vc, x0, y0, z0, x1, y1, z1, mat, bright, light);
+    }
+
+    /** Textured box in model pixels; {@code mat} is the tile index of whichever 4x4 atlas the buffer is bound to. */
+    public static void drawBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                               int mat, float bright, int light) {
+        PoseStack.Pose last = pose.last();
         Matrix4f m = last.pose();
         Matrix3f n = last.normal();
         float u0 = (mat % 4) * 0.25f, v0 = (mat / 4) * 0.25f;
