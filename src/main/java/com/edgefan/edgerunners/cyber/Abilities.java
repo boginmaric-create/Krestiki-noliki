@@ -26,6 +26,7 @@ public final class Abilities {
     public static final int MONOWIRE = 1;
     public static final int SCAN = 2;
     public static final int DOUBLE_JUMP = 3;
+    public static final int HORN = 4;
 
     public static final double SANDE_RADIUS = 24;
 
@@ -42,6 +43,7 @@ public final class Abilities {
             case MONOWIRE -> monowire(p);
             case SCAN -> scan(p);
             case DOUBLE_JUMP -> doubleJump(p);
+            case HORN -> { if (p.getVehicle() instanceof com.edgefan.edgerunners.vehicle.VehicleEntity v) v.honk(); }
             default -> {}
         }
     }

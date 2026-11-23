@@ -70,5 +70,17 @@
   "item.edgerunners.heavy_borg.desc": "Heavy armour plating, chest reactor and back exhausts that open when sprinting. +6 armour, knockback resistance, slightly slower.",
   "item.edgerunners.merc_arms": "Chrome Set: Mercenary Arms",
   "item.edgerunners.merc_arms.desc": "Full anodised cyber-arms with a spinning wrist rotor and servo fingers. +10% speed, +1 damage, +2 hearts.",
-  "gui.edgerunners.slot.chrome": "External chrome"
+  "gui.edgerunners.slot.chrome": "External chrome",
+  "entity.edgerunners.speedster": "Neon Speedster",
+  "entity.edgerunners.cyber_bike": "Cyber Bike",
+  "item.edgerunners.speedster": "Neon Speedster",
+  "item.edgerunners.speedster.desc": "Two-seat open-top wedge supercar with neon underglow.",
+  "item.edgerunners.cyber_bike": "Cyber Bike",
+  "item.edgerunners.cyber_bike.desc": "Fast, nimble bike with glowing hubless wheels. Leans into turns.",
+  "tooltip.edgerunners.paint": "Paint: %s (right-click the vehicle with a dye to repaint)",
+  "tooltip.edgerunners.vehicle_controls": "WASD drive, Space handbrake/drift, Ctrl nitro, H horn, Sneak+right-click to pick up",
+  "key.edgerunners.horn": "Vehicle horn",
+  "hud.edgerunners.kmh": "km/h",
+  "hud.edgerunners.boost": "NITRO",
+  "hud.edgerunners.hull": "HULL"
 }

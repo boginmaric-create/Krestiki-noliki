@@ -173,28 +173,34 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
     /** Textured box in model pixels; {@code mat} is the tile index of whichever 4x4 atlas the buffer is bound to. */
     public static void drawBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
                                int mat, float bright, int light) {
+        drawBox(pose, vc, x0, y0, z0, x1, y1, z1, mat, bright, bright, bright, light);
+    }
+
+    /** Tinted variant (vehicle paint). */
+    public static void drawBox(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                               int mat, float r, float g, float b, int light) {
         PoseStack.Pose last = pose.last();
         Matrix4f m = last.pose();
         Matrix3f n = last.normal();
         float u0 = (mat % 4) * 0.25f, v0 = (mat / 4) * 0.25f;
         float dx = x1 - x0, dy = y1 - y0, dz = z1 - z0;
         x0 /= 16; y0 /= 16; z0 /= 16; x1 /= 16; y1 /= 16; z1 /= 16;
-        face(vc, m, n, bright, light, 0, 0, -1, u0, v0, dx, dy, x0, y0, z0, x1, y0, z0, x1, y1, z0, x0, y1, z0);
-        face(vc, m, n, bright, light, 0, 0, 1, u0, v0, dx, dy, x0, y0, z1, x0, y1, z1, x1, y1, z1, x1, y0, z1);
-        face(vc, m, n, bright, light, -1, 0, 0, u0, v0, dz, dy, x0, y0, z0, x0, y1, z0, x0, y1, z1, x0, y0, z1);
-        face(vc, m, n, bright, light, 1, 0, 0, u0, v0, dz, dy, x1, y0, z0, x1, y0, z1, x1, y1, z1, x1, y1, z0);
-        face(vc, m, n, bright, light, 0, -1, 0, u0, v0, dx, dz, x0, y0, z0, x0, y0, z1, x1, y0, z1, x1, y0, z0);
-        face(vc, m, n, bright, light, 0, 1, 0, u0, v0, dx, dz, x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1);
+        face(vc, m, n, r, g, b, light, 0, 0, -1, u0, v0, dx, dy, x0, y0, z0, x1, y0, z0, x1, y1, z0, x0, y1, z0);
+        face(vc, m, n, r, g, b, light, 0, 0, 1, u0, v0, dx, dy, x0, y0, z1, x0, y1, z1, x1, y1, z1, x1, y0, z1);
+        face(vc, m, n, r, g, b, light, -1, 0, 0, u0, v0, dz, dy, x0, y0, z0, x0, y1, z0, x0, y1, z1, x0, y0, z1);
+        face(vc, m, n, r, g, b, light, 1, 0, 0, u0, v0, dz, dy, x1, y0, z0, x1, y0, z1, x1, y1, z1, x1, y1, z0);
+        face(vc, m, n, r, g, b, light, 0, -1, 0, u0, v0, dx, dz, x0, y0, z0, x0, y0, z1, x1, y0, z1, x1, y0, z0);
+        face(vc, m, n, r, g, b, light, 0, 1, 0, u0, v0, dx, dz, x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1);
     }
 
     /** One textured face. The tile covers 4x4 model pixels; smaller faces use a matching part of it. */
-    private static void face(VertexConsumer vc, Matrix4f m, Matrix3f n, float bright, int light,
+    private static void face(VertexConsumer vc, Matrix4f m, Matrix3f n, float r, float g, float b, int light,
                              float nx, float ny, float nz, float u0, float v0, float w, float h, float... v) {
         float us = 0.25f * Math.min(1f, w / 4f), vs = 0.25f * Math.min(1f, h / 4f);
         float[][] uvs = {{u0, v0}, {u0 + us, v0}, {u0 + us, v0 + vs}, {u0, v0 + vs}};
         for (int k = 0; k < 8; k++) { // both windings
             int i = k < 4 ? k : 7 - k;
-            vc.vertex(m, v[i * 3], v[i * 3 + 1], v[i * 3 + 2]).color(bright, bright, bright, 1f).uv(uvs[i][0], uvs[i][1])
+            vc.vertex(m, v[i * 3], v[i * 3 + 1], v[i * 3 + 2]).color(r, g, b, 1f).uv(uvs[i][0], uvs[i][1])
                     .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(n, nx, ny, nz).endVertex();
         }
     }

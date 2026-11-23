@@ -70,5 +70,17 @@
   "item.edgerunners.heavy_borg.desc": "Тяжёлая броня, реактор на груди, выхлопные заслонки раскрываются при беге. +6 брони, устойчивость к отбрасыванию, чуть медленнее.",
   "item.edgerunners.merc_arms": "Хром: Наёмница",
   "item.edgerunners.merc_arms.desc": "Полные кибер-руки с вращающимся ротором на запястье и пальцами на сервоприводах. +10% к скорости, +1 к урону, +2 сердца.",
-  "gui.edgerunners.slot.chrome": "Внешний хром"
+  "gui.edgerunners.slot.chrome": "Внешний хром",
+  "entity.edgerunners.speedster": "Неоновый спидстер",
+  "entity.edgerunners.cyber_bike": "Кибербайк",
+  "item.edgerunners.speedster": "Неоновый спидстер",
+  "item.edgerunners.speedster.desc": "Двухместный открытый суперкар-клин с неоновой подсветкой днища.",
+  "item.edgerunners.cyber_bike": "Кибербайк",
+  "item.edgerunners.cyber_bike.desc": "Быстрый и вёрткий байк со светящимися бесступичными колёсами. Наклоняется в поворотах.",
+  "tooltip.edgerunners.paint": "Цвет: %s (ПКМ красителем по транспорту — перекрасить)",
+  "tooltip.edgerunners.vehicle_controls": "WASD — езда, Пробел — ручник/дрифт, Ctrl — нитро, H — гудок, Shift+ПКМ — забрать",
+  "key.edgerunners.horn": "Гудок транспорта",
+  "hud.edgerunners.kmh": "км/ч",
+  "hud.edgerunners.boost": "НИТРО",
+  "hud.edgerunners.hull": "КОРПУС"
 }

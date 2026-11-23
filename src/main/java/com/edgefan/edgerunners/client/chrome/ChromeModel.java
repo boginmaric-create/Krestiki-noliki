@@ -13,7 +13,7 @@ import java.util.Map;
 public final class ChromeModel {
     public final Map<String, List<Group>> parts = new HashMap<>();
 
-    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, boolean chromeAtlas, String glow) {}
+    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, boolean chromeAtlas, String glow, boolean paint) {}
 
     public record Anim(boolean rotation, int axis, String signal, float amp, float speed, float phase, boolean range, float from, float to) {}
 
@@ -45,7 +45,8 @@ public final class ChromeModel {
             JsonObject c = el.getAsJsonObject();
             float[] fr = floats(c.getAsJsonArray("from")), to = floats(c.getAsJsonArray("to"));
             cubes.add(new Cube(fr[0], fr[1], fr[2], to[0], to[1], to[2], c.get("mat").getAsInt(),
-                    "c".equals(c.get("atlas").getAsString()), c.has("glow") ? c.get("glow").getAsString() : null));
+                    "c".equals(c.get("atlas").getAsString()), c.has("glow") ? c.get("glow").getAsString() : null,
+                    c.has("paint") && c.get("paint").getAsBoolean()));
         }
         List<Group> children = new ArrayList<>();
         if (o.has("children")) for (JsonElement el : o.getAsJsonArray("children")) children.add(group(el.getAsJsonObject()));

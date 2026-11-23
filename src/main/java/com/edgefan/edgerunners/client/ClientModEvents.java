@@ -21,11 +21,33 @@ public final class ClientModEvents {
         e.register(KeyBinds.SANDEVISTAN);
         e.register(KeyBinds.MONOWIRE);
         e.register(KeyBinds.SCAN);
+        e.register(KeyBinds.HORN);
     }
 
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent e) {
         e.enqueueWork(() -> MenuScreens.register(ModMenus.RIPPERDOC.get(), RipperdocScreen::new));
+    }
+
+    @SubscribeEvent
+    public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
+        e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.SPEEDSTER.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
+        e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.CYBER_BIKE.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
+    }
+
+    /** Vehicle items show their paint colour. */
+    @SubscribeEvent
+    public static void itemColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Item e) {
+        e.register((stack, tint) -> {
+            if (tint != 0) return 0xFFFFFF;
+            net.minecraft.world.item.DyeColor c = stack.hasTag() && stack.getTag().contains("Color")
+                    ? net.minecraft.world.item.DyeColor.byId(stack.getTag().getInt("Color"))
+                    : (stack.getItem() == com.edgefan.edgerunners.vehicle.ModVehicles.SPEEDSTER_ITEM.get()
+                    ? com.edgefan.edgerunners.vehicle.VehicleSpec.SPEEDSTER.defaultColor : com.edgefan.edgerunners.vehicle.VehicleSpec.CYBER_BIKE.defaultColor);
+            float[] d = c.getTextureDiffuseColors();
+            int r = (int) (Math.min(1f, d[0] * 1.15f + 0.04f) * 255), g = (int) (Math.min(1f, d[1] * 1.15f + 0.04f) * 255), b = (int) (Math.min(1f, d[2] * 1.15f + 0.04f) * 255);
+            return (r << 16) | (g << 8) | b;
+        }, com.edgefan.edgerunners.vehicle.ModVehicles.SPEEDSTER_ITEM.get(), com.edgefan.edgerunners.vehicle.ModVehicles.CYBER_BIKE_ITEM.get());
     }
 
     @SubscribeEvent
@@ -39,5 +61,6 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void overlays(RegisterGuiOverlaysEvent e) {
         e.registerAboveAll("cyber_hud", CyberHud.HUD);
+        e.registerAboveAll("vehicle_hud", com.edgefan.edgerunners.client.vehicle.VehicleHud.HUD);
     }
 }

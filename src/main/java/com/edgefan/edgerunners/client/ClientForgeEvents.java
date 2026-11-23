@@ -6,6 +6,9 @@ import com.edgefan.edgerunners.cyber.Cyberware;
 import com.edgefan.edgerunners.network.AbilityPacket;
 import com.edgefan.edgerunners.network.ClientCyberData;
 import com.edgefan.edgerunners.network.Network;
+import com.edgefan.edgerunners.client.vehicle.VehicleEngineSound;
+import com.edgefan.edgerunners.vehicle.VehicleEntity;
+import com.edgefan.edgerunners.vehicle.VehicleInput;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -31,6 +34,7 @@ import net.minecraftforge.fml.common.Mod;
 public final class ClientForgeEvents {
     private static boolean wasJumpDown;
     private static boolean doubleJumpUsed;
+    private static VehicleEngineSound engineSound;
 
     private ClientForgeEvents() {}
 
@@ -98,6 +102,21 @@ public final class ClientForgeEvents {
             if (ClientCyberData.has(Cyberware.MONOWIRE)) p.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         while (KeyBinds.SCAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SCAN));
+        while (KeyBinds.HORN.consumeClick()) if (p.getVehicle() instanceof VehicleEntity) Network.toServer(new AbilityPacket(Abilities.HORN));
+
+        // Vehicles: feed driver input to the entity and keep the engine sound running.
+        if (p.getVehicle() instanceof VehicleEntity v) {
+            if (v.getControllingPassenger() == p && mc.screen == null) {
+                VehicleInput.forward = (mc.options.keyUp.isDown() ? 1f : 0f) - (mc.options.keyDown.isDown() ? 1f : 0f);
+                VehicleInput.strafe = (mc.options.keyLeft.isDown() ? 1f : 0f) - (mc.options.keyRight.isDown() ? 1f : 0f);
+                VehicleInput.handbrake = mc.options.keyJump.isDown();
+                VehicleInput.boost = mc.options.keySprint.isDown();
+            } else VehicleInput.clear();
+            if (engineSound == null || engineSound.isStopped() || !engineSound.isFor(v)) {
+                engineSound = new VehicleEngineSound(v);
+                mc.getSoundManager().play(engineSound);
+            }
+        } else VehicleInput.clear();
 
         // Reinforced tendons: double jump (movement is client-authoritative, server just resets fall damage).
         boolean jumpDown = mc.options.keyJump.isDown();

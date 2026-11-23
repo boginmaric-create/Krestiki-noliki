@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  " CI",
+  "IRI",
+  "W W"
+ ],
+ "key": {
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "I": {
+   "item": "minecraft:iron_ingot"
+  },
+  "R": {
+   "item": "minecraft:redstone_block"
+  },
+  "W": {
+   "item": "minecraft:coal_block"
+  }
+ },
+ "result": {
+  "item": "edgerunners:cyber_bike",
+  "count": 1
+ }
+}
