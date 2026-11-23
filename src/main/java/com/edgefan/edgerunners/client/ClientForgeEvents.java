@@ -95,6 +95,7 @@ public final class ClientForgeEvents {
         if (p == null) return;
         FxManager.tick(mc);
         ChromeState.tick(mc);
+        com.edgefan.edgerunners.client.operation.OperationClient.tick(mc);
 
         while (KeyBinds.SANDEVISTAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SANDEVISTAN));
         while (KeyBinds.MONOWIRE.consumeClick()) {

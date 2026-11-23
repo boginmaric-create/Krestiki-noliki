@@ -1,6 +1,7 @@
 package com.edgefan.edgerunners.menu;
 
 import com.edgefan.edgerunners.block.ModBlocks;
+import com.edgefan.edgerunners.block.RipperdocChairBlockEntity;
 import com.edgefan.edgerunners.cyber.CyberData;
 import com.edgefan.edgerunners.cyber.CyberSlot;
 import com.edgefan.edgerunners.cyber.Cyberware;
@@ -53,12 +54,7 @@ public class RipperdocMenu extends AbstractContainerMenu {
     /** Why the implant in the input slot can't be installed, or null if it can. Works on both sides. */
     public static Component blockReason(ItemStack stack, int mask) {
         if (!(stack.getItem() instanceof CyberwareItem ci)) return null;
-        Cyberware c = ci.cyberware;
-        if ((mask & c.bit()) != 0) return Component.translatable("gui.edgerunners.already");
-        Cyberware occupying = c.slot.installed(mask);
-        if (occupying != null)
-            return Component.translatable("gui.edgerunners.slot_taken", Component.translatable("item.edgerunners." + occupying.id));
-        return null;
+        return com.edgefan.edgerunners.cyber.RipperdocOps.blockReason(ci.cyberware, mask);
     }
 
     @Override
@@ -70,6 +66,10 @@ public class RipperdocMenu extends AbstractContainerMenu {
         return remove(sp, CyberSlot.values()[slotIndex]);
     }
 
+    private RipperdocChairBlockEntity chair() {
+        return access.evaluate((level, pos) -> level.getBlockEntity(pos) instanceof RipperdocChairBlockEntity be ? be : null).orElse(null);
+    }
+
     private boolean install(ServerPlayer p) {
         ItemStack stack = input.getItem(0);
         if (!(stack.getItem() instanceof CyberwareItem ci)) return false;
@@ -78,34 +78,31 @@ public class RipperdocMenu extends AbstractContainerMenu {
             p.displayClientMessage(reason.copy().withStyle(ChatFormatting.RED), true);
             return false;
         }
-        Cyberware c = ci.cyberware;
-        CyberData.install(p, c);
-        CyberData.addPsychosis(p, c.load);
-        stack.shrink(1);
+        RipperdocChairBlockEntity chair = chair();
+        if (chair == null || chair.busy()) {
+            p.displayClientMessage(Component.translatable("msg.edgerunners.chair_busy").withStyle(ChatFormatting.GOLD), true);
+            return false;
+        }
+        ItemStack one = input.removeItem(0, 1);
         input.setChanged();
-        p.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 120, 0, false, false));
-        p.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1, false, false));
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ARMOR_EQUIP_NETHERITE, SoundSource.PLAYERS, 1f, 0.7f);
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.6f, 1.6f);
-        p.displayClientMessage(Component.translatable("msg.edgerunners.installed",
-                Component.translatable("item.edgerunners." + c.id)).withStyle(ChatFormatting.YELLOW), true);
-        Network.toPlayer(p, SyncPacket.of(p));
-        com.edgefan.edgerunners.cyber.ChromeBonuses.sync(p);
+        p.closeContainer();
+        if (!chair.begin(p, ci.cyberware, RipperdocChairBlockEntity.INSTALL, one)) {
+            p.getInventory().placeItemBackInInventory(one);
+            return false;
+        }
         return true;
     }
 
     private boolean remove(ServerPlayer p, CyberSlot slot) {
         Cyberware c = slot.installed(CyberData.implants(p));
         if (c == null) return false;
-        CyberData.uninstall(p, c);
-        if (c == Cyberware.SANDEVISTAN) CyberData.set(p, CyberData.SANDE, 0);
-        p.getInventory().placeItemBackInInventory(new ItemStack(ModItems.IMPLANTS.get(c).get()));
-        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SHEEP_SHEAR, SoundSource.PLAYERS, 1f, 0.8f);
-        p.displayClientMessage(Component.translatable("msg.edgerunners.removed",
-                Component.translatable("item.edgerunners." + c.id)).withStyle(ChatFormatting.YELLOW), true);
-        Network.toPlayer(p, SyncPacket.of(p));
-        com.edgefan.edgerunners.cyber.ChromeBonuses.sync(p);
-        return true;
+        RipperdocChairBlockEntity chair = chair();
+        if (chair == null || chair.busy()) {
+            p.displayClientMessage(Component.translatable("msg.edgerunners.chair_busy").withStyle(ChatFormatting.GOLD), true);
+            return false;
+        }
+        p.closeContainer();
+        return chair.begin(p, c, RipperdocChairBlockEntity.REMOVE, ItemStack.EMPTY);
     }
 
     @Override

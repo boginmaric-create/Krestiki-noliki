@@ -33,6 +33,8 @@ public final class ClientModEvents {
     public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.SPEEDSTER.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
         e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.CYBER_BIKE.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
+        e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.CHAIR_SEAT.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
+        e.registerBlockEntityRenderer(com.edgefan.edgerunners.block.ModBlocks.CHAIR_BE.get(), ctx -> new com.edgefan.edgerunners.client.operation.ChairRenderer());
     }
 
     /** Vehicle items show their paint colour. */
@@ -62,5 +64,6 @@ public final class ClientModEvents {
     public static void overlays(RegisterGuiOverlaysEvent e) {
         e.registerAboveAll("cyber_hud", CyberHud.HUD);
         e.registerAboveAll("vehicle_hud", com.edgefan.edgerunners.client.vehicle.VehicleHud.HUD);
+        e.registerAboveAll("operation_hud", com.edgefan.edgerunners.client.operation.OperationHud.HUD);
     }
 }

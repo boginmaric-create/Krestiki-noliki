@@ -18,6 +18,7 @@ public class EdgerunnersMod {
     public EdgerunnersMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         ModBlocks.BLOCKS.register(bus);
+        ModBlocks.BLOCK_ENTITIES.register(bus);
         ModVehicles.ENTITIES.register(bus);
         ModItems.ITEMS.register(bus);
         ModMenus.MENUS.register(bus);

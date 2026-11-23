@@ -139,6 +139,16 @@ public final class CyberEvents {
         }
     }
 
+    /** Patients can't climb out of the ripperdoc chair mid-operation. */
+    @SubscribeEvent
+    public static void onMount(net.minecraftforge.event.entity.EntityMountEvent event) {
+        if (event.isDismounting() && !event.getLevel().isClientSide
+                && event.getEntityBeingMounted() instanceof com.edgefan.edgerunners.block.ChairSeatEntity seat && seat.locked
+                && event.getEntityMounting().isAlive() && !event.getEntityMounting().isRemoved()) {
+            event.setCanceled(true);
+        }
+    }
+
     /** Chrome stays with you after death; running timers do not. */
     @SubscribeEvent
     public static void onClone(PlayerEvent.Clone event) {

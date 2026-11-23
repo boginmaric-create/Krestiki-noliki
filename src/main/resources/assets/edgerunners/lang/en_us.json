@@ -82,5 +82,13 @@
   "key.edgerunners.horn": "Vehicle horn",
   "hud.edgerunners.kmh": "km/h",
   "hud.edgerunners.boost": "NITRO",
-  "hud.edgerunners.hull": "HULL"
+  "hud.edgerunners.hull": "HULL",
+  "msg.edgerunners.chair_busy": "The chair is busy - an operation is in progress",
+  "hud.edgerunners.op_install": "RIPPERDOC // INSTALLING: %s",
+  "hud.edgerunners.op_remove": "RIPPERDOC // REMOVING: %s",
+  "hud.edgerunners.op_stage.anesthesia": "Neural block engaged...",
+  "hud.edgerunners.op_stage.incision": "Opening access port...",
+  "hud.edgerunners.op_stage.integration": "Integrating neural links...",
+  "hud.edgerunners.op_stage.calibration": "Calibrating firmware...",
+  "hud.edgerunners.op_stage.closing": "Sealing and rebooting..."
 }

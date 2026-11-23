@@ -26,6 +26,7 @@ public final class FxManager {
     public static int shakeTicks, shakeMax;
     public static float shakeStrength;
     public static int scanTicks;
+    public static int flashTicks;
     public static final int SCAN_DURATION = 24;
 
     private FxManager() {}
@@ -76,6 +77,8 @@ public final class FxManager {
         if (ACTIVE.size() < 64) ACTIVE.add(fx);
     }
 
+    public static void flash(int ticks) { flashTicks = Math.max(flashTicks, ticks); }
+
     public static void shake(int ticks, float strength) {
         shakeTicks = Math.max(shakeTicks, ticks);
         shakeMax = Math.max(shakeTicks, 1);
@@ -87,6 +90,7 @@ public final class FxManager {
         Ghosts.tick(mc);
         if (shakeTicks > 0 && --shakeTicks == 0) shakeStrength = 0;
         if (scanTicks > 0) scanTicks--;
+        if (flashTicks > 0) flashTicks--;
         updateShader(mc);
     }
 

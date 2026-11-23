@@ -82,5 +82,13 @@
   "key.edgerunners.horn": "Гудок транспорта",
   "hud.edgerunners.kmh": "км/ч",
   "hud.edgerunners.boost": "НИТРО",
-  "hud.edgerunners.hull": "КОРПУС"
+  "hud.edgerunners.hull": "КОРПУС",
+  "msg.edgerunners.chair_busy": "Кресло занято — идёт операция",
+  "hud.edgerunners.op_install": "РИППЕРДОК // УСТАНОВКА: %s",
+  "hud.edgerunners.op_remove": "РИППЕРДОК // ИЗВЛЕЧЕНИЕ: %s",
+  "hud.edgerunners.op_stage.anesthesia": "Нейроблокада...",
+  "hud.edgerunners.op_stage.incision": "Вскрытие порта доступа...",
+  "hud.edgerunners.op_stage.integration": "Интеграция нейросвязей...",
+  "hud.edgerunners.op_stage.calibration": "Калибровка прошивки...",
+  "hud.edgerunners.op_stage.closing": "Закрытие и перезагрузка..."
 }
