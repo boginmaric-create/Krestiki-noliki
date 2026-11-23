@@ -1,6 +1,7 @@
 package com.edgefan.edgerunners.cyber;
 
 import com.edgefan.edgerunners.EdgerunnersMod;
+import com.edgefan.edgerunners.network.ImplantsPacket;
 import com.edgefan.edgerunners.network.Network;
 import com.edgefan.edgerunners.network.SyncPacket;
 import net.minecraft.ChatFormatting;
@@ -31,6 +32,8 @@ public final class CyberEvents {
             "msg.edgerunners.whisper1", "msg.edgerunners.whisper2", "msg.edgerunners.whisper3", "msg.edgerunners.whisper4"
     };
 
+    private static final String LAST_VISIBLE = "lastVisible";
+
     private CyberEvents() {}
 
     @SubscribeEvent
@@ -51,6 +54,14 @@ public final class CyberEvents {
         tickPsychosis(p);
 
         if (p.tickCount % 4 == 0) Network.toPlayer(p, SyncPacket.of(p));
+        // Let everyone nearby see this player's chrome (cheap: one small packet per second, or on state change).
+        int mask = CyberData.implants(p);
+        boolean active = CyberData.get(p, CyberData.SANDE) > 0;
+        int visible = mask | (active ? 1 << 30 : 0);
+        if (p.tickCount % 20 == 0 || CyberData.get(p, LAST_VISIBLE) != visible) {
+            CyberData.set(p, LAST_VISIBLE, visible);
+            Network.toTrackingAndSelf(p, new ImplantsPacket(p.getId(), mask, active));
+        }
     }
 
     private static void tickPsychosis(ServerPlayer p) {

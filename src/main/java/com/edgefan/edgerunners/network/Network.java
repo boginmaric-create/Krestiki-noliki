@@ -23,6 +23,13 @@ public final class Network {
         CHANNEL.messageBuilder(SyncPacket.class, 1, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(SyncPacket::encode).decoder(SyncPacket::new)
                 .consumerMainThread(SyncPacket::handle).add();
+        CHANNEL.messageBuilder(ImplantsPacket.class, 2, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ImplantsPacket::encode).decoder(ImplantsPacket::new)
+                .consumerMainThread(ImplantsPacket::handle).add();
+    }
+
+    public static void toTrackingAndSelf(ServerPlayer p, Object msg) {
+        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), msg);
     }
 
     public static void toServer(Object msg) { CHANNEL.sendToServer(msg); }

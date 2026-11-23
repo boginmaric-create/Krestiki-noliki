@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +21,11 @@ public final class ClientForgeEvents {
     private static boolean doubleJumpUsed;
 
     private ClientForgeEvents() {}
+
+    @SubscribeEvent
+    public static void onLogout(ClientPlayerNetworkEvent.LoggingOut e) {
+        ClientCyberData.VISIBLE.clear();
+    }
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent e) {
