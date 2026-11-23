@@ -1,6 +1,9 @@
 package com.edgefan.edgerunners.cyber;
 
 import com.edgefan.edgerunners.EdgerunnersMod;
+import com.edgefan.edgerunners.effect.ModEffects;
+import com.edgefan.edgerunners.item.MantisBladeItem;
+import com.edgefan.edgerunners.network.FxPacket;
 import com.edgefan.edgerunners.network.ImplantsPacket;
 import com.edgefan.edgerunners.network.Network;
 import com.edgefan.edgerunners.network.SyncPacket;
@@ -104,15 +107,23 @@ public final class CyberEvents {
         p.connection.send(new ClientboundSetSubtitleTextPacket(Component.translatable("msg.edgerunners.berserk_sub").withStyle(ChatFormatting.RED)));
         p.connection.send(new ClientboundSetTitleTextPacket(Component.translatable("msg.edgerunners.berserk").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD)));
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WARDEN_ROAR, SoundSource.PLAYERS, 0.8f, 1.3f);
+        Network.fx(p, FxPacket.BERSERK, p.getX(), p.getY(), p.getZ(), 0, 0);
     }
 
-    /** Gorilla Arms: brutal bare-handed punches. */
+    /** Melee hits: mantis blade slashes and gorilla-arm punches. */
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
         if (!(event.getSource().getEntity() instanceof Player p) || event.getSource().getDirectEntity() != p) return;
-        if (!event.getSource().is(DamageTypes.PLAYER_ATTACK) || !p.getMainHandItem().isEmpty()) return;
-        if (!CyberData.has(p, Cyberware.GORILLA_ARMS)) return;
+        if (!event.getSource().is(DamageTypes.PLAYER_ATTACK)) return;
         LivingEntity target = event.getEntity();
+        double cy = target.getY() + target.getBbHeight() * 0.55;
+        if (p.getMainHandItem().getItem() instanceof MantisBladeItem) {
+            target.addEffect(new MobEffectInstance(ModEffects.BLEEDING.get(), 80, 0));
+            Network.fx(p, FxPacket.SLASH, target.getX(), cy, target.getZ(), p.getYRot(), p.getXRot());
+            return;
+        }
+        if (!p.getMainHandItem().isEmpty() || !CyberData.has(p, Cyberware.GORILLA_ARMS)) return;
+        Network.fx(p, FxPacket.PUNCH, target.getX(), cy, target.getZ(), p.getYRot(), p.getXRot());
         event.setAmount(event.getAmount() + 7f);
         float yaw = p.getYRot() * Mth.DEG_TO_RAD;
         target.knockback(1.4, Mth.sin(yaw), -Mth.cos(yaw));

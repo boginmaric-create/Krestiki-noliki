@@ -1,14 +1,3 @@
 {
- "loader": "forge:separate_transforms",
- "base": {
-  "parent": "edgerunners:item/3d/cyber_chip"
- },
- "perspectives": {
-  "gui": {
-   "parent": "minecraft:item/generated",
-   "textures": {
-    "layer0": "edgerunners:item/cyber_chip"
-   }
-  }
- }
+ "parent": "edgerunners:item/3d/cyber_chip"
 }

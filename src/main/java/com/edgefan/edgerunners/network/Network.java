@@ -26,6 +26,15 @@ public final class Network {
         CHANNEL.messageBuilder(ImplantsPacket.class, 2, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ImplantsPacket::encode).decoder(ImplantsPacket::new)
                 .consumerMainThread(ImplantsPacket::handle).add();
+        CHANNEL.messageBuilder(FxPacket.class, 3, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(FxPacket::encode).decoder(FxPacket::new)
+                .consumerMainThread(FxPacket::handle).add();
+    }
+
+    /** Plays an effect for everyone who can see {@code source} (including the source player). */
+    public static void fx(net.minecraft.world.entity.Entity source, int type, double x, double y, double z, float yaw, float pitch) {
+        CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> source),
+                new FxPacket(type, source.getId(), (float) x, (float) y, (float) z, yaw, pitch));
     }
 
     public static void toTrackingAndSelf(ServerPlayer p, Object msg) {

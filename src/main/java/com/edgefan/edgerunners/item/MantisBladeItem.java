@@ -1,5 +1,7 @@
 package com.edgefan.edgerunners.item;
 
+import com.edgefan.edgerunners.network.FxPacket;
+import com.edgefan.edgerunners.network.Network;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -32,6 +34,10 @@ public class MantisBladeItem extends SwordItem {
         player.fallDistance = 0;
         player.getCooldowns().addCooldown(this, 40);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1f, 0.6f);
+        if (!level.isClientSide) {
+            Vec3 at = player.getEyePosition().add(look.scale(1.2)).add(0, -0.3, 0);
+            Network.fx(player, FxPacket.LUNGE, at.x, at.y, at.z, player.getYRot(), player.getXRot());
+        }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
 

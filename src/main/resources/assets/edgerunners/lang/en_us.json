@@ -12,7 +12,7 @@
   "item.edgerunners.gorilla_arms": "Gorilla Arms",
   "item.edgerunners.gorilla_arms.desc": "Bare-handed hits deal +7 damage and huge knockback.",
   "item.edgerunners.mantis_blade": "Mantis Blade",
-  "item.edgerunners.mantis_blade.desc": "Right-click to lunge forward.",
+  "item.edgerunners.mantis_blade.desc": "Right-click to lunge forward. Hits cause bleeding.",
   "item.edgerunners.immunosuppressant": "Immunosuppressant",
   "item.edgerunners.immunosuppressant.desc": "Lowers cyberpsychosis by 35 (not below the cyberware baseline).",
   "item.edgerunners.ripperdoc_kit": "Ripperdoc Kit",
@@ -60,5 +60,6 @@
   "gui.edgerunners.slot.legs": "Skeleton / legs",
   "tooltip.edgerunners.slot": "Slot: %s",
   "msg.edgerunners.need_ripperdoc": "Cyberware is installed by a ripperdoc - use a Ripperdoc Chair",
-  "msg.edgerunners.removed": "Removed: %s"
+  "msg.edgerunners.removed": "Removed: %s",
+  "effect.edgerunners.bleeding": "Bleeding"
 }

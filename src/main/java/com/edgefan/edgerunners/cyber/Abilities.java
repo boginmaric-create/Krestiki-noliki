@@ -1,6 +1,8 @@
 package com.edgefan.edgerunners.cyber;
 
 import net.minecraft.ChatFormatting;
+import com.edgefan.edgerunners.network.FxPacket;
+import com.edgefan.edgerunners.network.Network;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -66,6 +68,7 @@ public final class Abilities {
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1f, 2f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1f, 0.6f);
         bar(p, "msg.edgerunners.sande_on", ChatFormatting.GREEN);
+        Network.fx(p, FxPacket.SANDE_START, p.getX(), p.getY(), p.getZ(), p.getYRot(), 0);
     }
 
     /** Called every server tick while the Sandevistan is running. */
@@ -136,14 +139,8 @@ public final class Abilities {
         double range = 8;
         DustParticleOptions wire = new DustParticleOptions(new Vector3f(1f, 0.16f, 0.43f), 0.7f);
 
-        // Visible whip arc.
-        for (int i = -4; i <= 4; i++) {
-            Vec3 dir = look.yRot(i * 0.18f);
-            for (double t = 1; t <= range; t += 0.5) {
-                Vec3 pt = eye.add(dir.scale(t)).add(0, -0.3, 0);
-                level.sendParticles(wire, pt.x, pt.y, pt.z, 1, 0, 0, 0, 0);
-            }
-        }
+        // The glowing whip itself is drawn client-side.
+        Network.fx(p, FxPacket.MONOWIRE, eye.x, eye.y, eye.z, p.getYRot(), p.getXRot());
         int hits = 0;
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(range), e -> e != p && e.isAlive())) {
             Vec3 to = e.position().add(0, e.getBbHeight() / 2, 0).subtract(eye);
@@ -153,6 +150,8 @@ public final class Abilities {
             e.setDeltaMovement(e.getDeltaMovement().add(pull.x, 0.15, pull.z));
             e.hurtMarked = true;
             level.sendParticles(ParticleTypes.CRIT, e.getX(), e.getY() + e.getBbHeight() / 2, e.getZ(), 8, 0.2, 0.3, 0.2, 0.2);
+            level.sendParticles(wire, e.getX(), e.getY() + e.getBbHeight() / 2, e.getZ(), 12, 0.25, 0.4, 0.25, 0);
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, e.getX(), e.getY() + e.getBbHeight() / 2, e.getZ(), 10, 0.2, 0.3, 0.2, 0.3);
             hits++;
         }
         level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1f, 1.6f);
@@ -178,6 +177,7 @@ public final class Abilities {
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SPYGLASS_USE, SoundSource.PLAYERS, 1f, 1.5f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 2f);
         bar(p, "msg.edgerunners.scan", ChatFormatting.AQUA, found.size());
+        Network.fx(p, FxPacket.SCAN, p.getX(), p.getY(), p.getZ(), 0, 0);
     }
 
     // ---------------------------------------------------------------- Tendons double jump
@@ -185,6 +185,7 @@ public final class Abilities {
         if (!CyberData.has(p, Cyberware.REINFORCED_TENDONS)) return;
         p.fallDistance = 0;
         p.serverLevel().sendParticles(ParticleTypes.CLOUD, p.getX(), p.getY(), p.getZ(), 10, 0.3, 0.05, 0.3, 0.02);
+        Network.fx(p, FxPacket.DOUBLE_JUMP, p.getX(), p.getY(), p.getZ(), 0, 0);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.PISTON_EXTEND, SoundSource.PLAYERS, 0.5f, 1.8f);
     }
 }

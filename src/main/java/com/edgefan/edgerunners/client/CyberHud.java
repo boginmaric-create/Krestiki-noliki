@@ -8,7 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import com.edgefan.edgerunners.client.fx.FxManager;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 public final class CyberHud {
@@ -17,6 +19,8 @@ public final class CyberHud {
     private static final int PINK = 0xFFFF2A6D;
     private static final int GREEN = 0xFF39FF88;
     private static final int GRAY = 0xFF8A8F98;
+
+    private static final RandomSource RNG = RandomSource.create();
 
     private CyberHud() {}
 
@@ -32,6 +36,31 @@ public final class CyberHud {
             int a = (int) (0x30 + 0x10 * Mth.sin(t * 0.6f));
             g.fill(0, 0, w, h, (a << 24) | 0x33FF99);
             for (int y = (int) (t % 4); y < h; y += 4) g.fill(0, y, w, y + 1, 0x1400FFD0);
+        }
+        // Kiroshi scan line sweeping down the screen.
+        if (FxManager.scanTicks > 0) {
+            float k = 1f - (FxManager.scanTicks - partialTick) / FxManager.SCAN_DURATION;
+            int sy = (int) (h * Mth.clamp(k, 0f, 1f));
+            for (int i = 0; i < 28; i++) {
+                int a = (int) (0x48 * (1f - i / 28f));
+                g.fill(0, sy - i, w, sy - i + 1, (a << 24) | 0x00F0FF);
+            }
+            g.fill(0, sy, w, sy + 1, 0xE000F0FF);
+            int c = 0xC000F0FF, L = 14;
+            g.fill(w / 2 - 40, h / 2 - 30, w / 2 - 40 + L, h / 2 - 29, c); g.fill(w / 2 - 40, h / 2 - 30, w / 2 - 39, h / 2 - 30 + L, c);
+            g.fill(w / 2 + 40 - L, h / 2 - 30, w / 2 + 40, h / 2 - 29, c); g.fill(w / 2 + 39, h / 2 - 30, w / 2 + 40, h / 2 - 30 + L, c);
+            g.fill(w / 2 - 40, h / 2 + 29, w / 2 - 40 + L, h / 2 + 30, c); g.fill(w / 2 - 40, h / 2 + 30 - L, w / 2 - 39, h / 2 + 30, c);
+            g.fill(w / 2 + 40 - L, h / 2 + 29, w / 2 + 40, h / 2 + 30, c); g.fill(w / 2 + 39, h / 2 + 30 - L, w / 2 + 40, h / 2 + 30, c);
+        }
+        // Cyberpsychosis glitch: torn scanline bars and colour splits.
+        if ((ClientCyberData.berserk > 0 || psy >= 90) && RNG.nextFloat() < (ClientCyberData.berserk > 0 ? 0.6f : 0.15f)) {
+            int bars = 2 + RNG.nextInt(6);
+            for (int i = 0; i < bars; i++) {
+                int by = RNG.nextInt(Math.max(1, h)), bh = 1 + RNG.nextInt(5), off = RNG.nextInt(30) - 15;
+                int col = RNG.nextBoolean() ? 0x00F0FF : 0xFF2A6D;
+                g.fill(Math.max(0, off), by, Math.min(w, w + off), by + bh, ((0x30 + RNG.nextInt(0x50)) << 24) | col);
+            }
+            if (RNG.nextFloat() < 0.08f) g.fill(0, 0, w, h, 0x22FF0033);
         }
         // Psychosis vignette.
         if (psy >= 75 || ClientCyberData.berserk > 0) {

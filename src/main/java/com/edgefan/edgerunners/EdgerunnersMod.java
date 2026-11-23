@@ -1,6 +1,7 @@
 package com.edgefan.edgerunners;
 
 import com.edgefan.edgerunners.block.ModBlocks;
+import com.edgefan.edgerunners.effect.ModEffects;
 import com.edgefan.edgerunners.item.ModItems;
 import com.edgefan.edgerunners.menu.ModMenus;
 import com.edgefan.edgerunners.network.Network;
@@ -17,6 +18,7 @@ public class EdgerunnersMod {
         ModBlocks.BLOCKS.register(bus);
         ModItems.ITEMS.register(bus);
         ModMenus.MENUS.register(bus);
+        ModEffects.EFFECTS.register(bus);
         ModItems.TABS.register(bus);
         Network.register();
     }

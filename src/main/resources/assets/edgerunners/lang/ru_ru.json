@@ -12,7 +12,7 @@
   "item.edgerunners.gorilla_arms": "Руки гориллы",
   "item.edgerunners.gorilla_arms.desc": "Удары голыми руками: +7 урона и мощное отбрасывание.",
   "item.edgerunners.mantis_blade": "Клинок-богомол",
-  "item.edgerunners.mantis_blade.desc": "ПКМ — рывок вперёд.",
+  "item.edgerunners.mantis_blade.desc": "ПКМ — рывок вперёд. Удары вызывают кровотечение.",
   "item.edgerunners.immunosuppressant": "Иммунодепрессант",
   "item.edgerunners.immunosuppressant.desc": "Снижает киберпсихоз на 35 (не ниже базового уровня от имплантов).",
   "item.edgerunners.ripperdoc_kit": "Набор риппердока",
@@ -60,5 +60,6 @@
   "gui.edgerunners.slot.legs": "Скелет / ноги",
   "tooltip.edgerunners.slot": "Слот: %s",
   "msg.edgerunners.need_ripperdoc": "Импланты ставит риппердок — используйте кресло риппердока",
-  "msg.edgerunners.removed": "Извлечено: %s"
+  "msg.edgerunners.removed": "Извлечено: %s",
+  "effect.edgerunners.bleeding": "Кровотечение"
 }

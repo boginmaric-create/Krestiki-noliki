@@ -10,7 +10,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import com.edgefan.edgerunners.client.fx.FxManager;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,6 +28,23 @@ public final class ClientForgeEvents {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut e) {
         ClientCyberData.VISIBLE.clear();
+        FxManager.clear();
+    }
+
+    @SubscribeEvent
+    public static void onRenderLevel(RenderLevelStageEvent e) {
+        if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES)
+            FxManager.render(e.getPoseStack(), e.getCamera().getPosition(), e.getPartialTick());
+    }
+
+    @SubscribeEvent
+    public static void onCamera(ViewportEvent.ComputeCameraAngles e) {
+        float off = FxManager.shakeOffset((float) e.getPartialTick());
+        if (off != 0) {
+            e.setRoll(e.getRoll() + off);
+            e.setPitch(e.getPitch() + off * 0.35f);
+            e.setYaw(e.getYaw() + off * 0.25f);
+        }
     }
 
     @SubscribeEvent
@@ -33,6 +53,7 @@ public final class ClientForgeEvents {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer p = mc.player;
         if (p == null) return;
+        FxManager.tick(mc);
 
         while (KeyBinds.SANDEVISTAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SANDEVISTAN));
         while (KeyBinds.MONOWIRE.consumeClick()) {
