@@ -44,17 +44,49 @@ public final class ClientForgeEvents {
         FxManager.clear();
         ChromeState.clear();
         ChromeRenderer.clearCache();
+        ClientCyberData.HEROES.clear();
+    }
+
+    private static int scaledPlayer = -1;
+
+    /** Hero personas: hide the vanilla body (the layer draws the hero) and apply the hero's size. */
+    @SubscribeEvent
+    public static void onRenderPlayerPre(net.minecraftforge.client.event.RenderPlayerEvent.Pre e) {
+        com.edgefan.edgerunners.hero.HeroSpec hero = com.edgefan.edgerunners.hero.HeroSpec.byStored(ClientCyberData.HEROES.getOrDefault(e.getEntity().getId(), 0));
+        if (hero == null) return;
+        PlayerModel<AbstractClientPlayer> m = e.getRenderer().getModel();
+        m.head.visible = m.hat.visible = m.body.visible = m.jacket.visible = false;
+        m.rightArm.visible = m.leftArm.visible = m.rightSleeve.visible = m.leftSleeve.visible = false;
+        m.rightLeg.visible = m.leftLeg.visible = m.rightPants.visible = m.leftPants.visible = false;
+        e.getPoseStack().pushPose();
+        e.getPoseStack().scale(hero.scale, hero.scale, hero.scale);
+        scaledPlayer = e.getEntity().getId();
+    }
+
+    @SubscribeEvent
+    public static void onRenderPlayerPost(net.minecraftforge.client.event.RenderPlayerEvent.Post e) {
+        if (scaledPlayer == e.getEntity().getId()) {
+            e.getPoseStack().popPose();
+            scaledPlayer = -1;
+        }
     }
 
     /** First person: draw the external chrome on the visible arm. */
     @SubscribeEvent
     public static void onRenderArm(RenderArmEvent e) {
         AbstractClientPlayer p = e.getPlayer();
-        Integer data = ClientCyberData.VISIBLE.get(p.getId());
-        if (data == null) return;
-        Cyberware set = ChromeRenderer.installedSet(data);
-        if (set == null) return;
-        ChromeModel model = ChromeRenderer.model(set);
+        com.edgefan.edgerunners.hero.HeroSpec hero = com.edgefan.edgerunners.hero.HeroSpec.byStored(ClientCyberData.HEROES.getOrDefault(p.getId(), 0));
+        ChromeModel model;
+        if (hero != null) {
+            model = ChromeRenderer.load("hero/" + hero.id + ".json");
+            e.setCanceled(true);
+        } else {
+            Integer data = ClientCyberData.VISIBLE.get(p.getId());
+            if (data == null) return;
+            Cyberware set = ChromeRenderer.installedSet(data);
+            if (set == null) return;
+            model = ChromeRenderer.model(set);
+        }
         if (model == null) return;
         if (!(Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(p) instanceof PlayerRenderer pr)) return;
         PlayerModel<AbstractClientPlayer> m = pr.getModel();
@@ -103,6 +135,8 @@ public final class ClientForgeEvents {
             if (ClientCyberData.has(Cyberware.MONOWIRE)) p.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         while (KeyBinds.SCAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SCAN));
+        while (KeyBinds.LAUNCH.consumeClick()) Network.toServer(new AbilityPacket(Abilities.LAUNCH));
+        while (KeyBinds.HERO.consumeClick()) Network.toServer(new AbilityPacket(Abilities.HERO));
         while (KeyBinds.HORN.consumeClick()) if (p.getVehicle() instanceof VehicleEntity) Network.toServer(new AbilityPacket(Abilities.HORN));
 
         // Vehicles: feed driver input to the entity and keep the engine sound running.

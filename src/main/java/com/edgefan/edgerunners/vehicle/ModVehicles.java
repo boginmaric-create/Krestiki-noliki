@@ -20,6 +20,10 @@ public final class ModVehicles {
             () -> EntityType.Builder.<com.edgefan.edgerunners.block.ChairSeatEntity>of(com.edgefan.edgerunners.block.ChairSeatEntity::new, MobCategory.MISC)
                     .sized(0.2f, 0.2f).noSave().clientTrackingRange(10).build("chair_seat"));
 
+    public static final RegistryObject<EntityType<com.edgefan.edgerunners.weapon.MissileEntity>> MISSILE = ENTITIES.register("missile",
+            () -> EntityType.Builder.<com.edgefan.edgerunners.weapon.MissileEntity>of(com.edgefan.edgerunners.weapon.MissileEntity::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).clientTrackingRange(8).updateInterval(1).build("missile"));
+
     public static final RegistryObject<Item> SPEEDSTER_ITEM = ModItems.ITEMS.register("speedster",
             () -> new VehicleItem(SPEEDSTER, VehicleSpec.SPEEDSTER, new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> CYBER_BIKE_ITEM = ModItems.ITEMS.register("cyber_bike",

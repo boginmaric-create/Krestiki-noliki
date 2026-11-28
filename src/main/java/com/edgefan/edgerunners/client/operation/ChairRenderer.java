@@ -55,7 +55,7 @@ public class ChairRenderer implements BlockEntityRenderer<RipperdocChairBlockEnt
         pose.translate(0.5, 0, 0.5);
         pose.mulPose(Axis.YP.rotationDegrees(-(be.facing().toYRot() - 180f)));
         pose.translate(-0.5, 0, -0.5);
-        ChromeRenderer.renderGroups(pose, buffers, model.parts.get("root"), new ChromeRenderer.AnimSource() {
+        ChromeRenderer.renderGroups(pose, buffers, model, model.parts.get("root"), new ChromeRenderer.AnimSource() {
             @Override public float signal(String name, float phase) {
                 return switch (name) {
                     case "swing" -> arm.swing();

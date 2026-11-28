@@ -1,0 +1,24 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  "GCG",
+  "CXC",
+  "GCG"
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "X": {
+   "item": "minecraft:netherite_ingot"
+  }
+ },
+ "result": {
+  "item": "edgerunners:persona_chrome_tyrant",
+  "count": 1
+ }
+}

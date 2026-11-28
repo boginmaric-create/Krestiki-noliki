@@ -12,8 +12,10 @@ import java.util.Map;
 /** Data for one external chrome set: per body part, a tree of animated groups of textured cubes. */
 public final class ChromeModel {
     public final Map<String, List<Group>> parts = new HashMap<>();
+    /** Texture for each atlas key used by the cubes ("b" = base materials, "c" = chrome materials, others from the file). */
+    public final Map<String, net.minecraft.resources.ResourceLocation> textures = new java.util.LinkedHashMap<>();
 
-    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, boolean chromeAtlas, String glow, boolean paint) {}
+    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, String atlas, String glow, boolean paint) {}
 
     public record Anim(boolean rotation, int axis, String signal, float amp, float speed, float phase, boolean range, float from, float to) {}
 
@@ -21,6 +23,11 @@ public final class ChromeModel {
 
     public static ChromeModel parse(JsonObject root) {
         ChromeModel m = new ChromeModel();
+        m.textures.put("b", new net.minecraft.resources.ResourceLocation("edgerunners", "textures/item/cyberware.png"));
+        m.textures.put("c", new net.minecraft.resources.ResourceLocation("edgerunners", "textures/item/chrome.png"));
+        if (root.has("textures"))
+            for (Map.Entry<String, JsonElement> t : root.getAsJsonObject("textures").entrySet())
+                m.textures.put(t.getKey(), new net.minecraft.resources.ResourceLocation(t.getValue().getAsString()));
         JsonObject parts = root.getAsJsonObject("parts");
         for (Map.Entry<String, JsonElement> e : parts.entrySet()) {
             List<Group> list = new ArrayList<>();
@@ -45,7 +52,7 @@ public final class ChromeModel {
             JsonObject c = el.getAsJsonObject();
             float[] fr = floats(c.getAsJsonArray("from")), to = floats(c.getAsJsonArray("to"));
             cubes.add(new Cube(fr[0], fr[1], fr[2], to[0], to[1], to[2], c.get("mat").getAsInt(),
-                    "c".equals(c.get("atlas").getAsString()), c.has("glow") ? c.get("glow").getAsString() : null,
+                    c.get("atlas").getAsString(), c.has("glow") ? c.get("glow").getAsString() : null,
                     c.has("paint") && c.get("paint").getAsBoolean()));
         }
         List<Group> children = new ArrayList<>();

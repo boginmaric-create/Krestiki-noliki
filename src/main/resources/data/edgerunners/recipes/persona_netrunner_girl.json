@@ -1,0 +1,24 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "misc",
+ "pattern": [
+  "GCG",
+  "CXC",
+  "GCG"
+ ],
+ "key": {
+  "G": {
+   "item": "minecraft:gold_ingot"
+  },
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "X": {
+   "item": "minecraft:ender_eye"
+  }
+ },
+ "result": {
+  "item": "edgerunners:persona_netrunner_girl",
+  "count": 1
+ }
+}

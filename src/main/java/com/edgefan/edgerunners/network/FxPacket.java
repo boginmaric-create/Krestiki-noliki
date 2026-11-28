@@ -9,7 +9,8 @@ import java.util.function.Supplier;
 
 /** Server -> client: play a visual effect. Purely cosmetic. */
 public record FxPacket(int type, int entityId, float x, float y, float z, float yaw, float pitch) {
-    public static final int SANDE_START = 0, MONOWIRE = 1, SLASH = 2, PUNCH = 3, SCAN = 4, DOUBLE_JUMP = 5, LUNGE = 6, BERSERK = 7;
+    public static final int SANDE_START = 0, MONOWIRE = 1, SLASH = 2, PUNCH = 3, SCAN = 4, DOUBLE_JUMP = 5, LUNGE = 6, BERSERK = 7,
+            TRACER = 8, HACK = 9, TRANSFORM = 10, SLAM = 11, BLAST = 12;
 
     public FxPacket(FriendlyByteBuf b) {
         this(b.readByte(), b.readVarInt(), b.readFloat(), b.readFloat(), b.readFloat(), b.readFloat(), b.readFloat());

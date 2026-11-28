@@ -15,6 +15,10 @@ public final class CyberData {
     public static final String MONO_CD = "monoCd";
     public static final String SCAN_CD = "scanCd";
     public static final String BERSERK = "berserk";    // cyberpsychosis episode ticks left
+    public static final String PLS_CD = "plsCd";
+    public static final String HERO = "hero";          // persona: HeroSpec ordinal + 1, 0 = none
+    public static final String HERO_CD = "heroCd";
+    public static final String BARRAGE = "barrage";    // gunner's infinite-ammo window
 
     public static final int SANDE_DURATION = 120;
     public static final int SANDE_COOLDOWN = 600;
@@ -47,7 +51,11 @@ public final class CyberData {
     }
 
     /** Psychosis never decays below half the installed cyberware load. */
-    public static float baseline(Player p) { return totalLoad(implants(p)) * 0.5f; }
+    public static float baseline(Player p) {
+        float b = totalLoad(implants(p)) * 0.5f;
+        if (get(p, HERO) == com.edgefan.edgerunners.hero.HeroSpec.CHROME_TYRANT.ordinal() + 1) b += 20f;
+        return Math.min(95f, b);
+    }
 
     public static float psychosis(Player p) { return tag(p).getFloat(PSYCHOSIS); }
 

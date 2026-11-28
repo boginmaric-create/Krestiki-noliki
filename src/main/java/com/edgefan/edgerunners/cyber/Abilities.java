@@ -1,7 +1,13 @@
 package com.edgefan.edgerunners.cyber;
 
 import net.minecraft.ChatFormatting;
+import com.edgefan.edgerunners.hero.HeroSpec;
 import com.edgefan.edgerunners.network.FxPacket;
+import com.edgefan.edgerunners.weapon.MissileEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import com.edgefan.edgerunners.network.Network;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -27,6 +33,8 @@ public final class Abilities {
     public static final int SCAN = 2;
     public static final int DOUBLE_JUMP = 3;
     public static final int HORN = 4;
+    public static final int LAUNCH = 5;
+    public static final int HERO = 6;
 
     public static final double SANDE_RADIUS = 24;
 
@@ -43,6 +51,8 @@ public final class Abilities {
             case MONOWIRE -> monowire(p);
             case SCAN -> scan(p);
             case DOUBLE_JUMP -> doubleJump(p);
+            case LAUNCH -> launch(p);
+            case HERO -> heroAbility(p);
             case HORN -> { if (p.getVehicle() instanceof com.edgefan.edgerunners.vehicle.VehicleEntity v) v.honk(); }
             default -> {}
         }
@@ -64,8 +74,9 @@ public final class Abilities {
             bar(p, "msg.edgerunners.cooldown", ChatFormatting.RED, cd / 20 + 1);
             return;
         }
-        CyberData.set(p, CyberData.SANDE, CyberData.SANDE_DURATION);
-        CyberData.set(p, CyberData.SANDE_CD, ChromeBonuses.cooldown(p, CyberData.SANDE_COOLDOWN));
+        boolean kid = HeroSpec.of(p) == HeroSpec.RUNNER_KID;
+        CyberData.set(p, CyberData.SANDE, kid ? CyberData.SANDE_DURATION * 3 / 2 : CyberData.SANDE_DURATION);
+        CyberData.set(p, CyberData.SANDE_CD, ChromeBonuses.cooldown(p, kid ? CyberData.SANDE_COOLDOWN * 7 / 10 : CyberData.SANDE_COOLDOWN));
         CyberData.addPsychosis(p, 6);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1f, 2f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1f, 0.6f);
@@ -147,7 +158,7 @@ public final class Abilities {
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(range), e -> e != p && e.isAlive())) {
             Vec3 to = e.position().add(0, e.getBbHeight() / 2, 0).subtract(eye);
             if (to.length() > range || to.normalize().dot(look) < 0.55) continue;
-            e.hurt(p.damageSources().playerAttack(p), 9f);
+            e.hurt(p.damageSources().playerAttack(p), HeroSpec.of(p) == HeroSpec.NETRUNNER_GIRL ? 13.5f : 9f);
             Vec3 pull = to.normalize().scale(-0.45);
             e.setDeltaMovement(e.getDeltaMovement().add(pull.x, 0.15, pull.z));
             e.hurtMarked = true;
@@ -180,6 +191,114 @@ public final class Abilities {
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 2f);
         bar(p, "msg.edgerunners.scan", ChatFormatting.AQUA, found.size());
         Network.fx(p, FxPacket.SCAN, p.getX(), p.getY(), p.getZ(), 0, 0);
+    }
+
+    // ---------------------------------------------------------------- Projectile launch system
+    private static void launch(ServerPlayer p) {
+        if (!CyberData.has(p, Cyberware.PROJECTILE_LAUNCHER)) {
+            bar(p, "msg.edgerunners.not_installed", ChatFormatting.GRAY, Component.translatable("item.edgerunners.projectile_launcher"));
+            return;
+        }
+        int cd = CyberData.get(p, CyberData.PLS_CD);
+        if (cd > 0) {
+            bar(p, "msg.edgerunners.cooldown", ChatFormatting.RED, cd / 20 + 1);
+            return;
+        }
+        CyberData.set(p, CyberData.PLS_CD, ChromeBonuses.cooldown(p, 60));
+        CyberData.addPsychosis(p, 2f);
+        Vec3 look = p.getLookAngle();
+        Vec3 right = look.cross(new Vec3(0, 1, 0)).normalize();
+        Vec3 base = p.getEyePosition().add(look.scale(0.8)).add(right.scale(0.35)).add(0, -0.35, 0);
+        MissileEntity.launch(p, base, look.add(right.scale(0.06)).add(0, 0.03, 0));
+        MissileEntity.launch(p, base.add(0, -0.15, 0), look.add(right.scale(-0.04)).add(0, 0.06, 0));
+        p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 1f, 0.8f);
+    }
+
+    // ---------------------------------------------------------------- Hero abilities
+    private static void heroAbility(ServerPlayer p) {
+        HeroSpec hero = HeroSpec.of(p);
+        if (hero == null) {
+            bar(p, "msg.edgerunners.no_hero", ChatFormatting.GRAY);
+            return;
+        }
+        int cd = CyberData.get(p, CyberData.HERO_CD);
+        if (cd > 0) {
+            bar(p, "msg.edgerunners.cooldown", ChatFormatting.RED, cd / 20 + 1);
+            return;
+        }
+        ServerLevel level = p.serverLevel();
+        Vec3 look = p.getLookAngle();
+        switch (hero) {
+            case RUNNER_KID -> {
+                Vec3 dir = new Vec3(look.x, 0, look.z).normalize();
+                AABB path = p.getBoundingBox().expandTowards(dir.scale(9)).inflate(1.0);
+                for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, path, e -> e != p && e.isAlive())) {
+                    e.invulnerableTime = 0;
+                    e.hurt(p.damageSources().playerAttack(p), 9f);
+                    e.knockback(0.8, -dir.x, -dir.z);
+                }
+                CyberData.set(p, CyberData.SANDE, Math.max(CyberData.get(p, CyberData.SANDE), 30));
+                p.setDeltaMovement(dir.x * 3.2, 0.2, dir.z * 3.2);
+                p.hurtMarked = true;
+                p.fallDistance = 0;
+                Network.fx(p, FxPacket.SANDE_START, p.getX(), p.getY(), p.getZ(), p.getYRot(), 0);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1f, 1.3f);
+            }
+            case NETRUNNER_GIRL -> {
+                Vec3 eye = p.getEyePosition();
+                Vec3 end = eye.add(look.scale(26));
+                HitResult block = level.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p));
+                if (block.getType() != HitResult.Type.MISS) end = block.getLocation();
+                EntityHitResult hit = ProjectileUtil.getEntityHitResult(level, p, eye, end, new AABB(eye, end).inflate(1.5),
+                        e -> e instanceof LivingEntity && e.isAlive() && !e.isSpectator());
+                if (hit == null || !(hit.getEntity() instanceof LivingEntity t)) {
+                    bar(p, "msg.edgerunners.no_target", ChatFormatting.GRAY);
+                    return;
+                }
+                t.setSecondsOnFire(6);
+                t.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2));
+                t.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 1));
+                t.addEffect(new MobEffectInstance(MobEffects.GLOWING, 100, 0));
+                t.hurt(p.damageSources().indirectMagic(p, p), 6f);
+                Network.fx(p, FxPacket.HACK, t.getX(), t.getY() + t.getBbHeight() * 0.6, t.getZ(), 0, 0);
+                level.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 1f, 2f);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 0.6f);
+                bar(p, "msg.edgerunners.hacked", ChatFormatting.LIGHT_PURPLE);
+            }
+            case GUNNER_GIRL -> {
+                CyberData.set(p, CyberData.BARRAGE, 100);
+                Network.fx(p, FxPacket.DOUBLE_JUMP, p.getX(), p.getY(), p.getZ(), 0, 0);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 1f, 0.6f);
+                bar(p, "msg.edgerunners.barrage", ChatFormatting.LIGHT_PURPLE);
+            }
+            case VETERAN_BORG -> {
+                for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class, p.getBoundingBox().inflate(6, 2, 6), e -> e != p && e.isAlive())) {
+                    double d = e.distanceTo(p);
+                    if (d > 6.5) continue;
+                    e.invulnerableTime = 0;
+                    e.hurt(p.damageSources().mobAttack(p), (float) (12 - d));
+                    Vec3 push = e.position().subtract(p.position()).normalize().scale(1.2);
+                    e.setDeltaMovement(push.x, 0.75, push.z);
+                    e.hurtMarked = true;
+                }
+                Network.fx(p, FxPacket.SLAM, p.getX(), p.getY(), p.getZ(), 0, 0);
+                level.sendParticles(ParticleTypes.EXPLOSION, p.getX(), p.getY() + 0.2, p.getZ(), 4, 1.5, 0.1, 1.5, 0);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 0.8f, 0.7f);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 1f, 0.5f);
+            }
+            case CHROME_TYRANT -> {
+                Vec3 right = look.cross(new Vec3(0, 1, 0)).normalize();
+                Vec3 base = p.getEyePosition().add(look.scale(1.0)).add(0, 0.3, 0);
+                for (int i = 0; i < 6; i++) {
+                    float k = (i - 2.5f) * 0.12f;
+                    MissileEntity.launch(p, base.add(right.scale(k * 2)), look.add(right.scale(k)).add(0, 0.12 + (i % 2) * 0.05, 0));
+                }
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 1.2f, 0.6f);
+                level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.WARDEN_ROAR, SoundSource.PLAYERS, 0.5f, 1.6f);
+            }
+        }
+        CyberData.set(p, CyberData.HERO_CD, ChromeBonuses.cooldown(p, hero.cooldown));
+        CyberData.addPsychosis(p, 3f);
     }
 
     // ---------------------------------------------------------------- Tendons double jump

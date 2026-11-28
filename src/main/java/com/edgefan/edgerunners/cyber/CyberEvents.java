@@ -43,7 +43,7 @@ public final class CyberEvents {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer p)) return;
 
-        for (String k : new String[]{CyberData.SANDE_CD, CyberData.MONO_CD, CyberData.SCAN_CD}) {
+        for (String k : new String[]{CyberData.SANDE_CD, CyberData.MONO_CD, CyberData.SCAN_CD, CyberData.PLS_CD, CyberData.HERO_CD, CyberData.BARRAGE}) {
             int v = CyberData.get(p, k);
             if (v > 0) CyberData.set(p, k, v - 1);
         }
@@ -61,10 +61,11 @@ public final class CyberEvents {
         // Let everyone nearby see this player's chrome (cheap: one small packet per second, or on state change).
         int mask = CyberData.implants(p);
         boolean active = CyberData.get(p, CyberData.SANDE) > 0;
-        int visible = mask | (active ? 1 << 30 : 0);
+        int hero = CyberData.get(p, CyberData.HERO);
+        int visible = (mask | (active ? 1 << 30 : 0)) ^ (hero * 0x9E3779B1);
         if (p.tickCount % 20 == 0 || CyberData.get(p, LAST_VISIBLE) != visible) {
             CyberData.set(p, LAST_VISIBLE, visible);
-            Network.toTrackingAndSelf(p, new ImplantsPacket(p.getId(), mask, active));
+            Network.toTrackingAndSelf(p, new ImplantsPacket(p.getId(), mask, active, hero));
         }
     }
 
@@ -123,7 +124,9 @@ public final class CyberEvents {
             Network.fx(p, FxPacket.SLASH, target.getX(), cy, target.getZ(), p.getYRot(), p.getXRot());
             return;
         }
-        if (!p.getMainHandItem().isEmpty() || !CyberData.has(p, Cyberware.GORILLA_ARMS)) return;
+        boolean vet = com.edgefan.edgerunners.hero.HeroSpec.of(p) == com.edgefan.edgerunners.hero.HeroSpec.VETERAN_BORG;
+        if (!p.getMainHandItem().isEmpty() || !(CyberData.has(p, Cyberware.GORILLA_ARMS) || vet)) return;
+        if (vet) event.setAmount(event.getAmount() + 4f);
         Network.fx(p, FxPacket.PUNCH, target.getX(), cy, target.getZ(), p.getYRot(), p.getXRot());
         event.setAmount(event.getAmount() + 7f);
         float yaw = p.getYRot() * Mth.DEG_TO_RAD;

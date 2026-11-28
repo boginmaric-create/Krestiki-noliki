@@ -26,8 +26,6 @@ import java.util.Optional;
 
 /** Renders the installed external chrome set on a player (third person) or on the first-person arm. */
 public final class ChromeRenderer {
-    private static final ResourceLocation BASE_ATLAS = new ResourceLocation(EdgerunnersMod.MODID, "textures/item/cyberware.png");
-    private static final ResourceLocation CHROME_ATLAS = new ResourceLocation(EdgerunnersMod.MODID, "textures/item/chrome.png");
     private static final Map<String, Optional<ChromeModel>> CACHE = new java.util.HashMap<>();
 
     private ChromeRenderer() {}
@@ -96,12 +94,22 @@ public final class ChromeRenderer {
     }
 
     /** Draw passes: each texture/glow combination needs its own buffer. */
-    private enum Pass { BASE_SOLID, CHROME_SOLID, BASE_GLOW, CHROME_GLOW }
+    private record Pass(String key, ResourceLocation texture, boolean glow) {
+        RenderType type() { return glow ? RenderType.entityTranslucentEmissive(texture) : RenderType.entityCutoutNoCull(texture); }
+    }
+
+    /** Solid passes for every texture first, then the emissive ones. */
+    private static java.util.List<Pass> passes(ChromeModel model) {
+        java.util.List<Pass> out = new java.util.ArrayList<>();
+        for (boolean glow : new boolean[]{false, true})
+            for (Map.Entry<String, ResourceLocation> t : model.textures.entrySet()) out.add(new Pass(t.getKey(), t.getValue(), glow));
+        return out;
+    }
 
     /** Renders a list of top-level groups in the current pose (used for vehicles). */
-    public static void renderGroups(PoseStack pose, MultiBufferSource buffers, List<ChromeModel.Group> groups, AnimSource src, int light) {
-        for (Pass pass : Pass.values()) {
-            VertexConsumer vc = buffers.getBuffer(renderType(pass));
+    public static void renderGroups(PoseStack pose, MultiBufferSource buffers, ChromeModel model, List<ChromeModel.Group> groups, AnimSource src, int light) {
+        for (Pass pass : passes(model)) {
+            VertexConsumer vc = buffers.getBuffer(pass.type());
             for (ChromeModel.Group g : groups) renderGroup(pose, vc, g, src, pass, light);
         }
     }
@@ -111,11 +119,11 @@ public final class ChromeRenderer {
     /** Third-person: every body part. */
     public static void renderAll(PoseStack pose, MultiBufferSource buffers, int light, PlayerModel<AbstractClientPlayer> m,
                                  ChromeModel model, AnimSource sig, boolean slim) {
-        for (Pass pass : Pass.values()) {
-            VertexConsumer vc = buffers.getBuffer(renderType(pass));
+        for (Pass pass : passes(model)) {
+            VertexConsumer vc = buffers.getBuffer(pass.type());
             for (Map.Entry<String, List<ChromeModel.Group>> e : model.parts.entrySet()) {
                 ModelPart part = part(m, e.getKey());
-                if (part == null || !part.visible) continue;
+                if (part == null) continue;
                 pose.pushPose();
                 part.translateAndRotate(pose);
                 slimAdjust(pose, e.getKey(), slim);
@@ -130,8 +138,8 @@ public final class ChromeRenderer {
                                  ChromeModel model, AnimSource sig, boolean slim) {
         List<ChromeModel.Group> groups = model.parts.get(partName);
         if (groups == null) return;
-        for (Pass pass : Pass.values()) {
-            VertexConsumer vc = buffers.getBuffer(renderType(pass));
+        for (Pass pass : passes(model)) {
+            VertexConsumer vc = buffers.getBuffer(pass.type());
             pose.pushPose();
             arm.translateAndRotate(pose);
             slimAdjust(pose, partName, slim);
@@ -140,14 +148,6 @@ public final class ChromeRenderer {
         }
     }
 
-    private static RenderType renderType(Pass pass) {
-        return switch (pass) {
-            case BASE_SOLID -> RenderType.entityCutoutNoCull(BASE_ATLAS);
-            case CHROME_SOLID -> RenderType.entityCutoutNoCull(CHROME_ATLAS);
-            case BASE_GLOW -> RenderType.entityTranslucentEmissive(BASE_ATLAS);
-            case CHROME_GLOW -> RenderType.entityTranslucentEmissive(CHROME_ATLAS);
-        };
-    }
 
     /** Slim (3px) arms: squeeze the 4px-wide design toward the arm's centre. */
     private static void slimAdjust(PoseStack pose, String part, boolean slim) {
@@ -186,10 +186,9 @@ public final class ChromeRenderer {
             pose.mulPose(new Quaternionf().rotationZYX(rz * Mth.DEG_TO_RAD, ry * Mth.DEG_TO_RAD, rx * Mth.DEG_TO_RAD));
         pose.translate(-g.px() / 16f, -g.py() / 16f, -g.pz() / 16f);
 
-        boolean glowPass = pass == Pass.BASE_GLOW || pass == Pass.CHROME_GLOW;
-        boolean chromePass = pass == Pass.CHROME_SOLID || pass == Pass.CHROME_GLOW;
+        boolean glowPass = pass.glow();
         for (ChromeModel.Cube c : g.cubes()) {
-            if (c.chromeAtlas() != chromePass || (c.glow() != null) != glowPass) continue;
+            if (!c.atlas().equals(pass.key()) || (c.glow() != null) != glowPass) continue;
             float bright = glowPass ? sig.glow(c.glow()) : 1f;
             if (glowPass && bright <= 0.02f) continue;
             float[] tint = c.paint() ? sig.paint() : null;

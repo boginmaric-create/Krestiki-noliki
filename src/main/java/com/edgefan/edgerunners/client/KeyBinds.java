@@ -11,6 +11,8 @@ public final class KeyBinds {
     public static final KeyMapping MONOWIRE = key("monowire", GLFW.GLFW_KEY_R);
     public static final KeyMapping SCAN = key("scan", GLFW.GLFW_KEY_B);
     public static final KeyMapping HORN = key("horn", GLFW.GLFW_KEY_H);
+    public static final KeyMapping LAUNCH = key("launch", GLFW.GLFW_KEY_G);
+    public static final KeyMapping HERO = key("hero", GLFW.GLFW_KEY_Z);
 
     private static KeyMapping key(String name, int code) {
         return new KeyMapping("key.edgerunners." + name, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, code, CATEGORY);

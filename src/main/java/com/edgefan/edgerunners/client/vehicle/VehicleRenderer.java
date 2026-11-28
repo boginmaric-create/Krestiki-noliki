@@ -42,7 +42,7 @@ public class VehicleRenderer extends EntityRenderer<VehicleEntity> {
         if (hurt > 0) pose.mulPose(Axis.ZP.rotationDegrees(Mth.sin((hurt - partial) * 1.3f) * hurt * 0.35f));
         float throttle = v.throttleVis, brake = v.brakeVis;
         boolean boosting = v.boosting;
-        ChromeRenderer.renderGroups(pose, buffers, model.parts.get("root"), new ChromeRenderer.AnimSource() {
+        ChromeRenderer.renderGroups(pose, buffers, model, model.parts.get("root"), new ChromeRenderer.AnimSource() {
             @Override public float signal(String name, float phase) {
                 return switch (name) {
                     case "wheel" -> wheel;

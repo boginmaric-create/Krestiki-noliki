@@ -7,6 +7,7 @@ public enum Cyberware {
     KIROSHI_OPTICS("kiroshi_optics", 10, CyberSlot.EYES),
     REINFORCED_TENDONS("reinforced_tendons", 10, CyberSlot.LEGS),
     GORILLA_ARMS("gorilla_arms", 15, CyberSlot.ARMS),
+    PROJECTILE_LAUNCHER("projectile_launcher", 20, CyberSlot.ARMS),
     // External chrome: visible, animated full-body sets (see assets/edgerunners/chrome/*.json)
     STREET_SAMURAI("street_samurai", 25, CyberSlot.CHROME),
     NETRUNNER_RIG("netrunner_rig", 20, CyberSlot.CHROME),

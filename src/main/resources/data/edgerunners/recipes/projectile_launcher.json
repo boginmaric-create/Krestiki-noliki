@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "CTC",
+  "IFI",
+  "CTC"
+ ],
+ "key": {
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "T": {
+   "item": "minecraft:tnt"
+  },
+  "I": {
+   "item": "minecraft:iron_block"
+  },
+  "F": {
+   "item": "minecraft:firework_rocket"
+  }
+ },
+ "result": {
+  "item": "edgerunners:projectile_launcher",
+  "count": 1
+ }
+}

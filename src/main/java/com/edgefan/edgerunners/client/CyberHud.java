@@ -28,7 +28,7 @@ public final class CyberHud {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.options.hideGui) return;
         float psy = ClientCyberData.psychosis;
-        if (ClientCyberData.implants == 0 && psy <= 0.5f) return;
+        if (ClientCyberData.implants == 0 && psy <= 0.5f && ClientCyberData.hero == 0) return;
         long t = mc.player.tickCount;
 
         // Sandevistan screen tint + scanlines.
@@ -100,11 +100,23 @@ public final class CyberHud {
         }
         if (ClientCyberData.has(Cyberware.KIROSHI_OPTICS)) {
             line(g, font, x, y, KeyBinds.SCAN, "item.edgerunners.kiroshi_optics", ClientCyberData.scanCd);
+            y += 10;
+        }
+        if (ClientCyberData.has(Cyberware.PROJECTILE_LAUNCHER)) {
+            line(g, font, x, y, KeyBinds.LAUNCH, "item.edgerunners.projectile_launcher", ClientCyberData.plsCd);
+            y += 10;
+        }
+        com.edgefan.edgerunners.hero.HeroSpec hero = com.edgefan.edgerunners.hero.HeroSpec.byStored(ClientCyberData.hero);
+        if (hero != null) {
+            line(g, font, x, y, KeyBinds.HERO, "hero.edgerunners." + hero.id + ".skill",
+                    ClientCyberData.barrage > 0 ? -ClientCyberData.barrage : ClientCyberData.heroCd);
         }
     };
 
     private static int countLines() {
         int n = 0;
+        if (ClientCyberData.has(Cyberware.PROJECTILE_LAUNCHER)) n++;
+        if (ClientCyberData.hero > 0) n++;
         if (ClientCyberData.has(Cyberware.SANDEVISTAN)) n++;
         if (ClientCyberData.has(Cyberware.MONOWIRE)) n++;
         if (ClientCyberData.has(Cyberware.KIROSHI_OPTICS)) n++;

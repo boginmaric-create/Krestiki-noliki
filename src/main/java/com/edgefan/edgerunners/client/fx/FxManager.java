@@ -27,6 +27,7 @@ public final class FxManager {
     public static float shakeStrength;
     public static int scanTicks;
     public static int flashTicks;
+    private static float recoil, recoilO;
     public static final int SCAN_DURATION = 24;
 
     private FxManager() {}
@@ -65,6 +66,39 @@ public final class FxManager {
                 if (self) scanTicks = SCAN_DURATION;
             }
             case FxPacket.DOUBLE_JUMP -> add(new RingFx(at.add(0, 0.05, 0), new Vec3(0, 1, 0), 1.8f, 0.35f, 0x00F0FF, 8, 0.25f));
+            case FxPacket.TRACER -> {
+                com.edgefan.edgerunners.weapon.GunSpec gun = com.edgefan.edgerunners.weapon.GunSpec.values()[Math.max(0, Math.min(3, (int) p.yaw()))];
+                add(new TracerFx(p.entityId(), at, gun.color, p.pitch() > 0.5f));
+                for (int i = 0; i < 3; i++)
+                    mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, RNG.nextGaussian() * 0.1, RNG.nextFloat() * 0.1, RNG.nextGaussian() * 0.1);
+                if (self && mc.player != null) {
+                    recoil = 1f;
+                    mc.player.setXRot(mc.player.getXRot() - gun.recoil);
+                    mc.player.setYRot(mc.player.getYRot() + (RNG.nextFloat() - 0.5f) * gun.recoil * 0.4f);
+                }
+            }
+            case FxPacket.HACK -> {
+                add(new BeamFx(p.entityId(), at));
+                add(new RingFx(at, new Vec3(0, 1, 0), 1.6f, 0.3f, 0xB040FF, 12, 0.6f));
+            }
+            case FxPacket.TRANSFORM -> {
+                int[] cols = {0x39FF88, 0xB040FF, 0xFF2A6D, 0xFF7820, 0xFF1030};
+                int c = cols[Math.max(0, Math.min(4, (int) p.yaw()))];
+                add(new RingFx(at.add(0, 0.05, 0), new Vec3(0, 1, 0), 4f, 0.5f, c, 16, 2.5f));
+                add(new RingFx(at.add(0, 1.0, 0), new Vec3(0, 1, 0), 2.5f, 0.3f, 0xFFFFFF, 10, 0f));
+                add(new RingFx(at.add(0, 2.0, 0), new Vec3(0, 1, 0), 1.8f, 0.25f, c, 12, 0f));
+                if (self) { flash(8); shake(10, 2f); }
+            }
+            case FxPacket.SLAM -> {
+                add(new RingFx(at.add(0, 0.05, 0), new Vec3(0, 1, 0), 7f, 0.9f, 0xFF7820, 14, 1.2f));
+                add(new RingFx(at.add(0, 0.1, 0), new Vec3(0, 1, 0), 4f, 0.6f, 0xFFFFFF, 8, 0.4f));
+                if (self) shake(12, 4f);
+            }
+            case FxPacket.BLAST -> {
+                add(new RingFx(at, new Vec3(0, 1, 0), 3.2f, 0.7f, 0xFF7820, 10, 0.8f));
+                add(new RingFx(at, new Vec3(1, 0, 0), 2.4f, 0.4f, 0xFFD040, 8, 0f));
+                if (mc.player != null && mc.player.position().distanceTo(at) < 8) shake(6, 1.5f);
+            }
             case FxPacket.BERSERK -> {
                 add(new RingFx(at.add(0, 0.05, 0), new Vec3(0, 1, 0), 10f, 0.8f, 0xFF1030, 20, 1.5f));
                 if (self) shake(30, 2.5f);
@@ -76,6 +110,8 @@ public final class FxManager {
     private static void add(Fx fx) {
         if (ACTIVE.size() < 64) ACTIVE.add(fx);
     }
+
+    public static float recoil(float partial) { return recoilO + (recoil - recoilO) * partial; }
 
     public static void flash(int ticks) { flashTicks = Math.max(flashTicks, ticks); }
 
@@ -91,6 +127,8 @@ public final class FxManager {
         if (shakeTicks > 0 && --shakeTicks == 0) shakeStrength = 0;
         if (scanTicks > 0) scanTicks--;
         if (flashTicks > 0) flashTicks--;
+        recoilO = recoil;
+        recoil *= 0.55f;
         updateShader(mc);
     }
 

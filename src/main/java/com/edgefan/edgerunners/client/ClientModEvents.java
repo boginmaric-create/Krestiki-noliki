@@ -22,6 +22,8 @@ public final class ClientModEvents {
         e.register(KeyBinds.MONOWIRE);
         e.register(KeyBinds.SCAN);
         e.register(KeyBinds.HORN);
+        e.register(KeyBinds.LAUNCH);
+        e.register(KeyBinds.HERO);
     }
 
     @SubscribeEvent
@@ -34,6 +36,7 @@ public final class ClientModEvents {
         e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.SPEEDSTER.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
         e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.CYBER_BIKE.get(), com.edgefan.edgerunners.client.vehicle.VehicleRenderer::new);
         e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.CHAIR_SEAT.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
+        e.registerEntityRenderer(com.edgefan.edgerunners.vehicle.ModVehicles.MISSILE.get(), com.edgefan.edgerunners.client.weapon.MissileRenderer::new);
         e.registerBlockEntityRenderer(com.edgefan.edgerunners.block.ModBlocks.CHAIR_BE.get(), ctx -> new com.edgefan.edgerunners.client.operation.ChairRenderer());
     }
 
@@ -65,5 +68,6 @@ public final class ClientModEvents {
         e.registerAboveAll("cyber_hud", CyberHud.HUD);
         e.registerAboveAll("vehicle_hud", com.edgefan.edgerunners.client.vehicle.VehicleHud.HUD);
         e.registerAboveAll("operation_hud", com.edgefan.edgerunners.client.operation.OperationHud.HUD);
+        e.registerAboveAll("gun_hud", com.edgefan.edgerunners.client.weapon.GunHud.HUD);
     }
 }

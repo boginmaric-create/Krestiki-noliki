@@ -43,6 +43,15 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
     public void render(PoseStack pose, MultiBufferSource buffers, int light, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         if (player.isInvisible()) return;
+        // Hero persona replaces the whole look.
+        com.edgefan.edgerunners.hero.HeroSpec hero = com.edgefan.edgerunners.hero.HeroSpec.byStored(ClientCyberData.HEROES.getOrDefault(player.getId(), 0));
+        if (hero != null) {
+            ChromeModel heroModel = ChromeRenderer.load("hero/" + hero.id + ".json");
+            if (heroModel != null)
+                ChromeRenderer.renderAll(pose, buffers, light, getParentModel(), heroModel,
+                        ChromeRenderer.Signals.of(player, partialTick, limbSwing, limbSwingAmount), slim);
+            return;
+        }
         Integer data = ClientCyberData.VISIBLE.get(player.getId());
         if (data == null || (data & ~ClientCyberData.SANDE_ACTIVE_BIT) == 0) return;
         Cyberware set = ChromeRenderer.installedSet(data);
@@ -82,6 +91,13 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                 cube(p, vc, px, 5.5f, -0.4f, px + 0.4f, 9f, 0.4f, CHROME, light);
                 p.end();
             }
+        }
+        if (has(data, Cyberware.PROJECTILE_LAUNCHER)) {
+            Part r = new Part(pose, m.rightArm);
+            cube(r, vc, -4.3f, 3.5f, -2.6f, -3.0f, 9.0f, 2.6f, PANEL, light);
+            cube(r, vc, -4.35f, 4.0f, -2.65f, -3.0f, 4.6f, 2.65f, HAZARD, light);
+            for (float z : new float[]{-1.8f, 0.4f}) cube(r, vc, -5.4f, 4.6f, z, -4.3f, 9.4f, z + 1.4f, CHROME, light);
+            r.end();
         }
         if (has(data, Cyberware.MONOWIRE)) {
             Part r = new Part(pose, m.rightArm);
@@ -138,6 +154,11 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             float swing = Mth.sin(ageInTicks * 0.2f) * 0.4f;
             cubeA(r, glow, -1.6f + swing, 9.6f, -0.3f, -1.2f + swing, 13.0f, 0.1f, G_PINK, pulse, fb);
             cubeA(r, glow, -1.9f + swing, 12.8f, -0.6f, -0.9f + swing, 13.6f, 0.4f, G_PINK, 1f, fb);
+            r.end();
+        }
+        if (has(data, Cyberware.PROJECTILE_LAUNCHER)) {
+            Part r = new Part(pose, m.rightArm);
+            for (float z : new float[]{-1.8f, 0.4f}) cubeA(r, glow, -5.2f, 9.4f, z + 0.2f, -4.5f, 9.5f, z + 1.2f, G_RED, pulse, fb);
             r.end();
         }
         if (has(data, Cyberware.REINFORCED_TENDONS)) {

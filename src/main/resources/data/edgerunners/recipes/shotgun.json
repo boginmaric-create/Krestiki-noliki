@@ -1,0 +1,27 @@
+{
+ "type": "minecraft:crafting_shaped",
+ "category": "equipment",
+ "pattern": [
+  "III",
+  "CGL",
+  " L "
+ ],
+ "key": {
+  "C": {
+   "item": "edgerunners:cyber_chip"
+  },
+  "I": {
+   "item": "minecraft:iron_ingot"
+  },
+  "G": {
+   "item": "minecraft:gunpowder"
+  },
+  "L": {
+   "item": "minecraft:leather"
+  }
+ },
+ "result": {
+  "item": "edgerunners:shotgun",
+  "count": 1
+ }
+}

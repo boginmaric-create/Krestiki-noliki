@@ -33,6 +33,22 @@ public final class ModItems {
     public static final RegistryObject<Item> RIPPERDOC_KIT = ITEMS.register("ripperdoc_kit",
             () -> new RipperdocKitItem(new Item.Properties().durability(8)));
 
+    public static final RegistryObject<Item> AMMO = ITEMS.register("ammo", () -> new Item(new Item.Properties()));
+
+    public static final Map<com.edgefan.edgerunners.weapon.GunSpec, RegistryObject<Item>> GUNS = new java.util.EnumMap<>(com.edgefan.edgerunners.weapon.GunSpec.class);
+
+    static {
+        for (com.edgefan.edgerunners.weapon.GunSpec g : com.edgefan.edgerunners.weapon.GunSpec.values())
+            GUNS.put(g, ITEMS.register(g.id, () -> new com.edgefan.edgerunners.weapon.GunItem(g, new Item.Properties().rarity(Rarity.RARE))));
+    }
+
+    public static final Map<com.edgefan.edgerunners.hero.HeroSpec, RegistryObject<Item>> PERSONAS = new java.util.EnumMap<>(com.edgefan.edgerunners.hero.HeroSpec.class);
+
+    static {
+        for (com.edgefan.edgerunners.hero.HeroSpec h : com.edgefan.edgerunners.hero.HeroSpec.values())
+            PERSONAS.put(h, ITEMS.register("persona_" + h.id, () -> new com.edgefan.edgerunners.hero.PersonaChipItem(h, new Item.Properties().rarity(Rarity.EPIC))));
+    }
+
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.edgerunners"))
             .icon(() -> new ItemStack(IMPLANTS.get(Cyberware.SANDEVISTAN).get()))
