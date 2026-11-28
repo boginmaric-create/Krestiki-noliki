@@ -4,7 +4,7 @@
   "item.edgerunners.sandevistan": "Sandevistan",
   "item.edgerunners.sandevistan.desc": "Spinal implant. [V] - slows the world around you for 6 s.",
   "item.edgerunners.monowire": "Monowire",
-  "item.edgerunners.monowire.desc": "Wrist-mounted razor wire. [R] - whip everything in front of you.",
+  "item.edgerunners.monowire.desc": "Wrist-mounted razor wire. [X] - whip everything in front of you.",
   "item.edgerunners.kiroshi_optics": "Kiroshi Optics",
   "item.edgerunners.kiroshi_optics.desc": "Cyber-eyes. [B] - scan and highlight all life within 40 blocks, night vision.",
   "item.edgerunners.reinforced_tendons": "Reinforced Tendons",
@@ -101,7 +101,7 @@
   "item.edgerunners.tech_rifle": "Tech Rifle",
   "item.edgerunners.tech_rifle.desc": "Electromagnetic coil rifle: rounds pierce through every target in line.",
   "tooltip.edgerunners.gun_stats": "Damage %s | Magazine %s | %s shots/s",
-  "tooltip.edgerunners.gun_controls": "Right-click fire, Sneak+right-click reload, uses Ammo",
+  "tooltip.edgerunners.gun_controls": "Right-click fire, [R] reload (or Sneak+right-click), uses Ammo",
   "item.edgerunners.projectile_launcher": "Projectile Launch System",
   "item.edgerunners.projectile_launcher.desc": "Forearm missile pod. [G] - two homing micro-missiles.",
   "key.edgerunners.launch": "Projectile launcher",
@@ -140,5 +140,8 @@
   "item.edgerunners.persona_gunner_girl": "Personality Chip: Gunner",
   "item.edgerunners.persona_veteran_borg": "Personality Chip: Veteran Borg",
   "item.edgerunners.persona_chrome_tyrant": "Personality Chip: Chrome Tyrant",
-  "entity.edgerunners.missile": "Micro-missile"
+  "entity.edgerunners.missile": "Micro-missile",
+  "key.edgerunners.reload": "Reload weapon",
+  "msg.edgerunners.mag_full": "Magazine is full",
+  "hud.edgerunners.reload_hint": "[%s] reload"
 }

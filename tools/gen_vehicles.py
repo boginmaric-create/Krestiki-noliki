@@ -6,7 +6,7 @@ Cubes with "paint": true are tinted with the vehicle's dye colour.
 Run from the repository root: python3 tools/gen_vehicles.py"""
 import math, os
 import gen_models as gm
-from gen_chrome import cube, group, rot_anim, ARMOR, GUNMETAL, DARKCHROME, SERVO, VENT, VISOR, CIRCUIT, G_ORANGE, G_ICE, CABLE
+from gen_chrome import cube, cyl, group, rot_anim, ARMOR, GUNMETAL, DARKCHROME, SERVO, VENT, VISOR, CIRCUIT, G_ORANGE, G_ICE, CABLE
 
 ROOT = 'src/main/resources/assets/edgerunners'
 
@@ -89,7 +89,7 @@ half = [
     paint((0, 4, -32), (14, 9, -26)),
     cube((0, 7, -32.3), (13, 8, -32.0), gm.G_RED, 'b', glow='brake'),
     cube((0, 2.5, -33), (12, 4.5, -30), gm.CARBON, 'b'),
-    cube((1, 4, -32.6), (3, 5.5, -32.0), DARKCHROME), cube((1.4, 4.4, -32.7), (2.6, 5.1, -32.6), G_ORANGE, glow='throttle'),
+    cyl((1, 4, -32.8), (3, 5.8, -31.8), 'z', DARKCHROME), cyl((1.4, 4.4, -32.9), (2.6, 5.4, -32.8), 'z', G_ORANGE, glow='throttle'),
     # rear deck, engine vents, headrest fairings
     paint((0, 9, -30), (13, 10.5, -11)),
     cube((0, 10.5, -26), (8, 10.7, -16), VENT, glow='throttle'),
@@ -99,7 +99,7 @@ half = [
     # seats
     cube((2, 9, -8), (9, 11, -1), gm.RUBBER, 'b'),
     # spoiler
-    cube((8, 10.5, -29), (9, 15, -28), GUNMETAL),
+    cyl((7.9, 10.5, -29.1), (9.1, 15, -27.9), 'y', GUNMETAL),
     cube((0, 15, -31), (14, 15.8, -26), gm.CARBON, 'b'),
     paint((14, 13.5, -31.5), (14.4, 16.5, -25.5)),
     cube((0, 15.8, -31.1), (14, 16.0, -30.8), gm.G_PINK, 'b', glow='pulse'),
@@ -122,7 +122,7 @@ car_groups = [
     group((5.5, 10, -8), [cube((2, 10, -10), (9, 17, -8), gm.RUBBER, 'b'), cube((4.5, 15, -10.2), (6.5, 16, -10), gm.G_PINK, 'b', glow='pulse')], rot=[-12, 0, 0]),
     group((-5.5, 10, -8), [cube((-9, 10, -10), (-2, 17, -8), gm.RUBBER, 'b'), cube((-6.5, 15, -10.2), (-4.5, 16, -10), gm.G_PINK, 'b', glow='pulse')], rot=[-12, 0, 0]),
     # steering wheel (driver on +X)
-    group((5.5, 12.5, 4.0), [cube((3.5, 11.2, 3.7), (7.5, 13.8, 4.3), DARKCHROME), cube((5.0, 12.2, 3.6), (6.0, 12.8, 3.7), G_ICE, glow='pulse')],
+    group((5.5, 12.5, 4.0), [cyl((3.4, 10.4, 3.7), (7.6, 14.6, 4.3), 'z', DARKCHROME), cube((5.0, 12.2, 3.6), (6.0, 12.8, 3.7), G_ICE, glow='pulse')],
           anims=[rot_anim("z", "steer", amp=-4)], rot=[-25, 0, 0]),
     car_wheel(12.5, 5.5, 20, front=True), car_wheel(-12.5, 5.5, 20, front=True),
     car_wheel(12.5, 5.5, -20), car_wheel(-12.5, 5.5, -20),
@@ -142,8 +142,8 @@ bike_half = [
     cube((3.5, 4.5, -4.5), (3.7, 8.5, -2.5), SERVO),
     cube((0, 5, -13), (1.0, 7, -4), GUNMETAL),
     paint((0, 8, -10), (3, 12, 10)),
-    cube((2, 4.6, -15), (3.4, 6.2, -6), gm.CHROME, 'b'),
-    cube((2.2, 4.8, -15.3), (3.2, 6.0, -15), G_ORANGE, glow='throttle'),
+    cyl((1.9, 4.5, -15), (3.5, 6.3, -6), 'z', gm.CHROME, 'b'),
+    cyl((2.15, 4.75, -15.3), (3.25, 6.05, -15), 'z', G_ORANGE, glow='throttle'),
     cube((0, 2.6, -8), (1.6, 3.0, 8), gm.G_CYAN, 'b', glow='pulse'),
 ]
 bike_groups = [
@@ -161,11 +161,11 @@ bike_groups = [
                            cube((-2, 11.5, -18.3), (2, 12.5, -18), gm.G_RED, 'b', glow='brake')], rot=[10, 0, 0]),
     # steering: fork, bars and front wheel turn together
     group((0, 12.5, 11), [
-        cube((-5, 13.5, 9.2), (5, 14.2, 10.0), GUNMETAL),
-        cube((-5.6, 13.3, 9.0), (-4.2, 14.4, 10.2), gm.RUBBER, 'b'), cube((4.2, 13.3, 9.0), (5.6, 14.4, 10.2), gm.RUBBER, 'b'),
+        cyl((-5, 13.45, 9.2), (5, 14.25, 10.0), 'x', GUNMETAL),
+        cyl((-5.8, 13.2, 9.0), (-4.2, 14.5, 10.2), 'x', gm.RUBBER, 'b'), cyl((4.2, 13.2, 9.0), (5.8, 14.5, 10.2), 'x', gm.RUBBER, 'b'),
         cube((-1.2, 14.2, 9.4), (1.2, 14.4, 10.6), CIRCUIT, glow='pulse'),
     ], anims=[rot_anim("y", "steer", amp=1)], children=[
-        group((0, 13, 10.5), [cube((-2.4, 5, 10.0), (-1.8, 13.2, 11.0), gm.CHROME, 'b'), cube((1.8, 5, 10.0), (2.4, 13.2, 11.0), gm.CHROME, 'b')], rot=[22, 0, 0]),
+        group((0, 13, 10.5), [cyl((-2.5, 5, 10.0), (-1.7, 13.2, 11.0), 'y', gm.CHROME, 'b'), cyl((1.7, 5, 10.0), (2.5, 13.2, 11.0), 'y', gm.CHROME, 'b')], rot=[22, 0, 0]),
         bike_wheel(13.5),
     ]),
     bike_wheel(-13.5),

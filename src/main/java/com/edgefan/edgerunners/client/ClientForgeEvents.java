@@ -135,6 +135,8 @@ public final class ClientForgeEvents {
             if (ClientCyberData.has(Cyberware.MONOWIRE)) p.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
         }
         while (KeyBinds.SCAN.consumeClick()) Network.toServer(new AbilityPacket(Abilities.SCAN));
+        while (KeyBinds.RELOAD.consumeClick())
+            if (p.getMainHandItem().getItem() instanceof com.edgefan.edgerunners.weapon.GunItem) Network.toServer(new AbilityPacket(Abilities.RELOAD));
         while (KeyBinds.LAUNCH.consumeClick()) Network.toServer(new AbilityPacket(Abilities.LAUNCH));
         while (KeyBinds.HERO.consumeClick()) Network.toServer(new AbilityPacket(Abilities.HERO));
         while (KeyBinds.HORN.consumeClick()) if (p.getVehicle() instanceof VehicleEntity) Network.toServer(new AbilityPacket(Abilities.HORN));

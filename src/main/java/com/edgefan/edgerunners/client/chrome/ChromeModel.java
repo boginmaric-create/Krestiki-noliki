@@ -15,7 +15,7 @@ public final class ChromeModel {
     /** Texture for each atlas key used by the cubes ("b" = base materials, "c" = chrome materials, others from the file). */
     public final Map<String, net.minecraft.resources.ResourceLocation> textures = new java.util.LinkedHashMap<>();
 
-    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, String atlas, String glow, boolean paint) {}
+    public record Cube(float x0, float y0, float z0, float x1, float y1, float z1, int mat, String atlas, String glow, boolean paint, int cylAxis) {}
 
     public record Anim(boolean rotation, int axis, String signal, float amp, float speed, float phase, boolean range, float from, float to) {}
 
@@ -53,7 +53,8 @@ public final class ChromeModel {
             float[] fr = floats(c.getAsJsonArray("from")), to = floats(c.getAsJsonArray("to"));
             cubes.add(new Cube(fr[0], fr[1], fr[2], to[0], to[1], to[2], c.get("mat").getAsInt(),
                     c.get("atlas").getAsString(), c.has("glow") ? c.get("glow").getAsString() : null,
-                    c.has("paint") && c.get("paint").getAsBoolean()));
+                    c.has("paint") && c.get("paint").getAsBoolean(),
+                    c.has("cyl") ? "xyz".indexOf(c.get("cyl").getAsString()) : -1));
         }
         List<Group> children = new ArrayList<>();
         if (o.has("children")) for (JsonElement el : o.getAsJsonArray("children")) children.add(group(el.getAsJsonObject()));

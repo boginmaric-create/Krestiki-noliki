@@ -22,6 +22,7 @@ public final class ClientModEvents {
         e.register(KeyBinds.MONOWIRE);
         e.register(KeyBinds.SCAN);
         e.register(KeyBinds.HORN);
+        e.register(KeyBinds.RELOAD);
         e.register(KeyBinds.LAUNCH);
         e.register(KeyBinds.HERO);
     }

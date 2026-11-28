@@ -25,13 +25,20 @@ C_GLOWS = {G_ORANGE, G_PURPLE, G_ICE, VENT, CIRCUIT}
 B = gm
 
 
-def cube(fr, to, mat, atlas='c', glow=None):
+def cube(fr, to, mat, atlas='c', glow=None, cyl=None):
+    """A textured box; with cyl='x'|'y'|'z' it renders as a 16-sided cylinder inscribed in the box."""
     if glow is None:
         glow = 'steady' if (atlas == 'c' and mat in C_GLOWS) or (atlas == 'b' and mat in gm.GLOWS) else None
     c = {"from": list(fr), "to": list(to), "mat": mat, "atlas": atlas}
     if glow:
         c["glow"] = glow
+    if cyl:
+        c["cyl"] = cyl
     return c
+
+
+def cyl(fr, to, axis, mat, atlas='c', glow=None):
+    return cube(fr, to, mat, atlas, glow=glow, cyl=axis)
 
 
 def group(pivot, cubes, anims=None, children=None, rot=None):
@@ -80,7 +87,7 @@ SETS = {}
 
 # ================================================================ Street samurai
 blade = group((-4.2, 9.0, 0), [
-    cube((-4.6, 8.3, -0.8), (-3.8, 9.7, 0.8), SERVO),
+    cyl((-4.6, 8.2, -0.8), (-3.8, 9.8, 0.8), 'x', SERVO),
     cube((-4.45, 4.4, -0.95), (-4.15, 8.6, 0.8), gm.STEEL, 'b'),
     cube((-4.43, 1.7, -0.75), (-4.17, 4.4, 0.6), gm.STEEL, 'b'),
     cube((-4.4, 0.2, -0.45), (-4.2, 1.7, 0.3), gm.CHROME, 'b'),
@@ -114,11 +121,11 @@ def cable_chain(x, n=4):
     child = None
     for k in reversed(range(n)):
         y0 = -1.5 + k * 3.0
-        cubes = [cube((x - 0.4, y0, 4.1 + k * 0.15), (x + 0.4, y0 + 3.1, 4.9 + k * 0.15), CABLE)]
+        cubes = [cyl((x - 0.45, y0, 4.05 + k * 0.15), (x + 0.45, y0 + 3.1, 4.95 + k * 0.15), 'y', CABLE)]
         if k == n - 1:
-            cubes.append(cube((x - 0.55, y0 + 2.6, 3.9 + k * 0.15), (x + 0.55, y0 + 3.4, 5.1 + k * 0.15), gm.GOLD, 'b'))
+            cubes.append(cyl((x - 0.6, y0 + 2.6, 3.9 + k * 0.15), (x + 0.6, y0 + 3.4, 5.1 + k * 0.15), 'y', gm.GOLD, 'b'))
         if k == 0:
-            cubes.append(cube((x - 0.6, y0 - 0.4, 3.9), (x + 0.6, y0 + 0.4, 4.9), DARKCHROME))
+            cubes.append(cyl((x - 0.65, y0 - 0.4, 3.85), (x + 0.65, y0 + 0.4, 4.95), 'y', DARKCHROME))
         g = group((x, y0, 4.5 + k * 0.15), cubes,
                   anims=[rot_anim("x", "sway", amp=6 + 5 * k, phase=k * 0.7),
                          rot_anim("x", "breath", amp=2 + k, phase=k * 0.5),
@@ -132,7 +139,7 @@ net_head = [group((0, 0, 0), [
     cube((-4.35, -6.0, -4.0), (-4.0, -5.3, 4.35), GUNMETAL), cube((4.0, -6.0, -4.0), (4.35, -5.3, 4.35), GUNMETAL),
     cube((-4.0, -6.0, 4.0), (4.0, -5.3, 4.35), GUNMETAL),
     cube((-3.0, -5.85, -4.42), (3.0, -5.45, -4.35), G_PURPLE, glow='pulse'),
-    cube((-4.6, -4.2, -1.5), (-4.0, -2.2, 0.5), DARKCHROME), cube((4.0, -4.2, -1.5), (4.6, -2.2, 0.5), DARKCHROME),
+    cyl((-4.7, -4.3, -1.6), (-4.0, -2.1, 0.6), 'x', DARKCHROME), cyl((4.0, -4.3, -1.6), (4.7, -2.1, 0.6), 'x', DARKCHROME),
     cube((-4.66, -3.6, -1.0), (-4.6, -2.8, 0.0), G_PURPLE, glow='pulse'), cube((4.6, -3.6, -1.0), (4.66, -2.8, 0.0), G_PURPLE, glow='pulse'),
     cube((-3.0, -2.9, -4.06), (-1.2, -2.7, -4.02), G_ICE, glow='flicker'), cube((1.2, -2.9, -4.06), (3.0, -2.7, -4.02), G_ICE, glow='flicker'),
     cube((-0.15, -1.8, -4.06), (0.15, -0.4, -4.02), G_ICE, glow='flicker'),
@@ -146,8 +153,8 @@ net_body = [group((0, 0, 0), [
     cube((-3.2, 10.5, 2.0), (3.2, 11.2, 3.8), GUNMETAL),
 ])]
 net_arm = [group((-1, 8, 0), [
-    cube((-3.3, 8.3, -2.3), (1.3, 9.3, 2.3), DARKCHROME),
-    cube((-3.35, 8.65, -2.35), (1.35, 8.95, 2.35), G_PURPLE, glow='pulse'),
+    cyl((-3.6, 8.3, -2.6), (1.6, 9.3, 2.6), 'y', DARKCHROME),
+    cyl((-3.7, 8.65, -2.7), (1.7, 8.95, 2.7), 'y', G_PURPLE, glow='pulse'),
     cube((-3.06, 3.0, -0.5), (-3.0, 8.2, 0.5), CIRCUIT, glow='flicker'),
     cube((-2.2, 9.3, -2.35), (0.2, 9.9, -2.05), G_ICE, glow='pulse'),
 ])]
@@ -158,12 +165,12 @@ SETS['netrunner_rig'] = {"item_part": "head", "load": 20, "parts": {
 borg_body = [group((0, 0, 0), [
     cube((-4.5, 0.3, -2.9), (4.5, 7.5, -2.0), RED_ARMOR),
     cube((-4.3, 7.5, -2.6), (4.3, 10.2, -2.0), GUNMETAL),
-    cube((-1.6, 2.4, -3.1), (1.6, 5.6, -2.9), DARKCHROME),
-    cube((-1.0, 3.0, -3.25), (1.0, 5.0, -3.1), G_ORANGE, glow='breath'),
+    cyl((-1.7, 2.3, -3.2), (1.7, 5.7, -2.9), 'z', DARKCHROME),
+    cyl((-1.1, 2.9, -3.35), (1.1, 5.1, -3.1), 'z', G_ORANGE, glow='breath'),
     cube((-4.6, -0.8, -2.7), (4.6, 0.6, 2.7), GUNMETAL),
     cube((-3.8, 1.0, 2.0), (-0.6, 7.0, 4.2), GUNMETAL), cube((0.6, 1.0, 2.0), (3.8, 7.0, 4.2), GUNMETAL),
     cube((-3.4, 1.6, 4.2), (-1.0, 6.4, 4.3), VENT, glow='heat'), cube((1.0, 1.6, 4.2), (3.4, 6.4, 4.3), VENT, glow='heat'),
-    cube((-0.4, 0.5, 2.0), (0.4, 11.0, 3.2), SERVO),
+    cyl((-0.6, 0.5, 2.0), (0.6, 11.0, 3.2), 'y', SERVO),
 ], children=[
     group((-2.2, 1.0, 4.3), [cube((-3.6, 1.0, 4.3), (-0.8, 6.6, 4.8), RED_ARMOR)],
           anims=[rot_anim("x", "sprint", amp=-55), rot_anim("x", "breath", amp=-6)]),
@@ -175,13 +182,13 @@ borg_arm = [group((-1, 0, 0), [
     cube((-4.8, -1.2, -3.2), (0.6, 0.4, 3.2), ARMOR),
     cube((-4.85, 0.0, -3.25), (0.4, 0.3, 3.25), G_ORANGE, glow='breath'),
     cube((-3.3, 1.2, -2.3), (1.3, 4.0, 2.3), GUNMETAL),
-    cube((-3.6, 3.6, -1.2), (1.6, 4.8, 1.2), SERVO),
+    cyl((-3.7, 3.4, -1.5), (1.7, 5.0, 1.5), 'x', SERVO),
     cube((-4.0, 4.6, -3.0), (1.8, 10.6, 3.0), RED_ARMOR),
     cube((-3.8, 10.2, -3.15), (1.6, 11.0, -2.2), DARKCHROME),
     cube((-4.05, 6.0, -2.0), (-4.0, 9.0, 2.0), VENT, glow='heat'),
-    cube((-1.6, 2.0, 2.3), (-0.4, 5.0, 3.3), GUNMETAL),
+    cyl((-1.7, 2.0, 2.3), (-0.3, 5.0, 3.5), 'y', GUNMETAL),
 ] + [cube((-3.4 + k * 1.7, 10.4, -3.25), (-2.6 + k * 1.7, 10.8, -3.15), G_ORANGE, glow='pulse') for k in range(3)],
-    children=[group((-1, 5, 2.8), [cube((-1.3, 5.0, 2.5), (-0.7, 8.5, 3.1), gm.CHROME, 'b')],
+    children=[group((-1, 5, 2.8), [cyl((-1.35, 5.0, 2.55), (-0.65, 8.5, 3.25), 'y', gm.CHROME, 'b')],
                     anims=[move_anim("y", "swing", 1.6)])])]
 borg_head = [group((0, 0, 0), [
     cube((-3.4, -3.0, -4.5), (3.4, 0.2, -3.9), GUNMETAL),
@@ -193,7 +200,7 @@ borg_head = [group((0, 0, 0), [
 borg_leg = [group((0, 0, 0), [
     cube((-2.5, 3.5, -2.6), (2.5, 6.5, -2.0), RED_ARMOR),
     cube((-2.3, 6.5, -2.4), (2.3, 11.0, -2.0), GUNMETAL),
-    cube((-0.4, 5.0, 2.0), (0.4, 10.0, 2.6), gm.CHROME, 'b'),
+    cyl((-0.45, 5.0, 2.0), (0.45, 10.0, 2.9), 'y', gm.CHROME, 'b'),
     cube((-2.4, 11.0, -2.5), (2.4, 12.2, 2.5), ARMOR),
 ])]
 SETS['heavy_borg'] = {"item_part": "right_arm", "load": 35, "parts": {
@@ -202,7 +209,7 @@ SETS['heavy_borg'] = {"item_part": "right_arm", "load": 35, "parts": {
 
 # ================================================================ Mercenary cyberarms
 rotor = group((-1, 8.9, 0), [
-    cube((-3.45, 8.6, -2.45), (1.45, 9.2, 2.45), DARKCHROME),
+    cyl((-3.7, 8.6, -2.7), (1.7, 9.2, 2.7), 'y', DARKCHROME),
     cube((-3.5, 8.75, -2.5), (-2.9, 9.05, -1.9), gm.G_PINK, 'b', glow='pulse'),
     cube((0.9, 8.75, 1.9), (1.5, 9.05, 2.5), gm.G_PINK, 'b', glow='pulse'),
 ], anims=[rot_anim("y", "age", amp=0, speed=8.0)])
@@ -213,10 +220,10 @@ fingers = group((-1, 10.2, -2.0), [
 merc_arm = [group((-1, 0, 0), [
     cube((-3.45, -2.45, -2.45), (1.45, 0.5, 2.45), TEAL),
     cube((-3.3, 0.5, -2.3), (1.3, 3.6, 2.3), WHITE),
-    cube((-3.55, 3.6, -1.5), (1.55, 4.6, 1.5), SERVO),
-    cube((-3.6, 3.95, -1.55), (1.6, 4.25, 1.55), gm.G_PINK, 'b', glow='pulse'),
+    cyl((-3.6, 3.3, -1.8), (1.6, 4.9, 1.8), 'x', SERVO),
+    cyl((-3.65, 3.7, -1.4), (1.65, 4.5, 1.4), 'x', gm.G_PINK, 'b', glow='pulse'),
     cube((-3.3, 4.6, -2.3), (1.3, 8.6, 2.3), TEAL),
-    cube((-3.65, 5.0, -0.5), (-3.3, 8.2, 0.5), gm.CHROME, 'b'),
+    cyl((-3.8, 5.0, -0.5), (-3.1, 8.2, 0.5), 'y', gm.CHROME, 'b'),
     cube((-3.2, 9.2, -2.2), (1.2, 10.3, 2.2), TEAL),
     cube((-1.6, 10.3, -0.6), (-0.4, 10.36, 0.6), gm.G_PINK, 'b', glow='pulse'),
     cube((-3.36, 0.8, -0.15), (-3.3, 8.5, 0.15), gm.G_PINK, 'b', glow='pulse'),
@@ -225,7 +232,7 @@ merc_arm = [group((-1, 0, 0), [
 merc_body = [group((0, 0, 0), [
     cube((-1.2, 0.5, 2.0), (1.2, 2.7, 2.7), TEAL),
     cube((-0.5, 1.1, 2.7), (0.5, 2.1, 2.8), gm.G_PINK, 'b', glow='pulse'),
-    cube((-4.3, -0.3, -2.3), (-3.7, 2.5, 2.3), SERVO), cube((3.7, -0.3, -2.3), (4.3, 2.5, 2.3), SERVO),
+    cyl((-4.4, -0.3, -1.4), (-3.6, 2.5, 1.4), 'x', SERVO), cyl((3.6, -0.3, -1.4), (4.4, 2.5, 1.4), 'x', SERVO),
 ])]
 SETS['merc_arms'] = {"item_part": "right_arm", "load": 25, "parts": {
     "right_arm": merc_arm, "left_arm": mirror_x(merc_arm), "body": merc_body}}

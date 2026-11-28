@@ -1,7 +1,7 @@
 """Gun item models (barrel along -Z), the micro-missile model and the projectile-launcher implant item.
 Run from the repository root: python3 tools/gen_guns.py"""
 import gen_models as gm
-from gen_chrome import cube, group, ARMOR, GUNMETAL, WHITE, DARKCHROME, VISOR, RED_ARMOR, G_ORANGE, CIRCUIT, SERVO
+from gen_chrome import cube, cyl, group, ARMOR, GUNMETAL, WHITE, DARKCHROME, VISOR, RED_ARMOR, G_ORANGE, CIRCUIT, SERVO
 
 ROOT = 'src/main/resources/assets/edgerunners'
 
@@ -13,44 +13,52 @@ def e(fr, to, mat, tex='b', glow=None, rot=None):
     return el
 
 
+B, C = '#atlas', '#chrome'
+cyl16, rbox, cross = gm.cyl16, gm.rbox, gm.cross
+
 GUNS = {
-    'smart_pistol': [
-        e((7, 9.5, 3), (9, 11.3, 12.5), gm.PANEL), e((7.6, 11.3, 3.2), (8.4, 11.6, 12.2), gm.CHROME),
-        e((7.1, 8, 4), (8.9, 9.5, 12), gm.STEEL), e((7.5, 9.8, 2), (8.5, 10.8, 3), gm.CHROME),
-        e((6.95, 10, 5), (7.0, 10.8, 11), gm.G_CYAN), e((9.0, 10, 5), (9.05, 10.8, 11), gm.G_CYAN),
-        e((7.6, 10.05, 1.95), (8.4, 10.55, 2.0), gm.G_CYAN),
-        e((7.15, 2.5, 9.5), (8.85, 8, 12), gm.RUBBER, rot=((8, 8, 11), 'x', -22.5)),
-        e((7.4, 7, 7), (8.6, 7.4, 9.6), DARKCHROME, 'c'), e((7.9, 7.4, 8.2), (8.1, 8.2, 8.6), gm.CHROME),
-        e((7.6, 11.3, 12), (8.4, 12, 12.6), DARKCHROME, 'c'), e((7.6, 11.3, 3.4), (8.4, 11.9, 3.9), DARKCHROME, 'c'),
-        e((7.2, 9.6, 12.5), (8.8, 11.2, 13.0), SERVO, 'c'),
-    ],
-    'smg': [
-        e((6.8, 8.5, 4), (9.2, 11, 13), gm.PANEL), e((6.75, 9.2, 5), (6.8, 10.4, 12), gm.HAZARD), e((9.2, 9.2, 5), (9.25, 10.4, 12), gm.HAZARD),
-        e((7.2, 9, 0.5), (8.8, 10.6, 4), gm.CARBON), e((7.4, 9.2, 0), (8.6, 10.4, 0.5), DARKCHROME, 'c'),
-        e((7.3, 3, 6), (8.7, 8.5, 8), GUNMETAL, 'c', rot=((8, 8.5, 7), 'x', 22.5)),
-        e((7.2, 3.5, 10), (8.8, 8.5, 12), gm.RUBBER, rot=((8, 8.5, 11), 'x', -22.5)),
-        e((7.4, 8.8, 13), (8.6, 9.6, 16), gm.STEEL), e((7.4, 6.5, 15.2), (8.6, 9.6, 16), gm.STEEL),
-        e((7.2, 11, 7), (8.8, 12.6, 10), DARKCHROME, 'c'), e((7.4, 11.3, 7.0), (8.6, 12.4, 7.05), VISOR, 'c'),
-        e((7.9, 11.7, 7.6), (8.1, 11.9, 7.65), gm.G_PINK), e((7.0, 7.8, 8.5), (9.0, 8.5, 9.0), DARKCHROME, 'c'),
-    ],
-    'shotgun': [
-        e((7.3, 9.8, 0), (8.7, 11.2, 12), DARKCHROME, 'c'), e((7.4, 8.4, 1.5), (8.6, 9.6, 10), GUNMETAL, 'c'),
-        e((7.1, 8.2, 2.5), (8.9, 9.8, 6.5), gm.RUBBER), e((7.05, 8.6, 3), (8.95, 8.9, 6), gm.CARBON),
-        e((6.9, 8.2, 9), (9.1, 11.4, 13.5), gm.PANEL), e((6.85, 10.6, 9.5), (6.9, 11.0, 13), gm.HAZARD),
-        e((7.2, 6.5, 13.5), (8.8, 10.5, 16), gm.CARBON), e((7.3, 5.0, 11), (8.7, 8.4, 13), gm.RUBBER, rot=((8, 8.2, 12), 'x', -22.5)),
-        e((7.6, 11.2, 0.5), (8.4, 11.7, 1.2), gm.CHROME), e((9.1, 9.0, 10), (9.15, 9.6, 12.5), gm.G_RED),
-        e((7.0, 11.4, 9.5), (9.0, 11.8, 13), DARKCHROME, 'c'),
-    ],
-    'tech_rifle': [
-        e((6.9, 8.8, 2), (9.1, 11.2, 15), WHITE, 'c'), e((6.85, 9.4, 4), (6.9, 10.6, 13), CIRCUIT, 'c'),
-        e((9.1, 9.4, 4), (9.15, 10.6, 13), CIRCUIT, 'c'),
-        e((7.0, 11.2, 0), (9.0, 11.6, 9), DARKCHROME, 'c'), e((7.0, 8.4, 0), (9.0, 8.8, 9), DARKCHROME, 'c'),
-        e((7.5, 9.5, 0), (8.5, 10.5, 2), gm.CHROME),
-        *[e((6.75, 8.3, z), (9.25, 11.7, z + 0.5), gm.G_CYAN) for z in (0.6, 2.6, 4.6, 6.6)],
-        e((7.3, 11.6, 6), (8.7, 12.8, 11), DARKCHROME, 'c'), e((7.45, 11.75, 5.95), (8.55, 12.65, 6.0), gm.LENS),
-        e((7.3, 7.0, 13), (8.7, 10.8, 16), WHITE, 'c'), e((7.4, 4.8, 11.2), (8.6, 8.8, 13), gm.RUBBER, rot=((8, 8.8, 12), 'x', -22.5)),
-        e((7.4, 5.8, 8.5), (8.6, 8.8, 10.5), GUNMETAL, 'c'), e((8.6, 6.4, 9.0), (8.65, 8.2, 10.0), gm.G_CYAN),
-    ],
+    'smart_pistol':
+        rbox((7, 9.5, 3), (9, 11.3, 12.5), 'z', 0.55, gm.PANEL, tex=B) +
+        rbox((7.6, 11.2, 3.2), (8.4, 11.6, 12.2), 'z', 0.18, gm.CHROME, tex=B) +
+        rbox((7.1, 8, 4), (8.9, 9.6, 12), 'z', 0.45, gm.STEEL, tex=B) +
+        cyl16('z', (8, 10.3, 2.4), 0.55, 1.6, gm.CHROME, tex=B) + cyl16('z', (8, 10.3, 1.55), 0.38, 0.12, gm.G_CYAN, tex=B) +
+        [e((6.95, 10, 5), (7.0, 10.8, 11), gm.G_CYAN), e((9.0, 10, 5), (9.05, 10.8, 11), gm.G_CYAN)] +
+        cross((7.15, 2.5, 9.5), (8.85, 8, 12), 'y', 0.35, gm.RUBBER, tex=B, rotation=((8, 8, 11), 'x', -22.5)) +
+        cyl16('x', (8, 7.4, 8.3), 0.25, 1.2, DARKCHROME, tex=C, sides=8) + [e((7.4, 7, 7), (8.6, 7.3, 9.6), DARKCHROME, 'c'),
+         e((7.9, 7.4, 8.2), (8.1, 8.2, 8.6), gm.CHROME)] +
+        rbox((7.6, 11.4, 12), (8.4, 12, 12.6), 'z', 0.2, DARKCHROME, tex=C) + rbox((7.6, 11.4, 3.4), (8.4, 11.9, 3.9), 'z', 0.2, DARKCHROME, tex=C) +
+        cyl16('z', (8, 10.4, 12.75), 0.8, 0.5, SERVO, tex=C),
+    'smg':
+        rbox((6.8, 8.5, 4), (9.2, 11, 13), 'z', 0.6, gm.PANEL, tex=B) +
+        [e((6.75, 9.2, 5), (6.8, 10.4, 12), gm.HAZARD), e((9.2, 9.2, 5), (9.25, 10.4, 12), gm.HAZARD)] +
+        cyl16('z', (8, 9.8, 2.25), 0.85, 3.5, gm.CARBON, tex=B) + cyl16('z', (8, 9.8, 0.25), 0.62, 0.5, DARKCHROME, tex=C) +
+        cyl16('z', (8, 9.8, 0.0), 0.35, 0.1, gm.G_PINK, tex=B, sides=8) +
+        cross((7.3, 3, 6), (8.7, 8.5, 8), 'y', 0.3, GUNMETAL, tex=C, rotation=((8, 8.5, 7), 'x', 22.5)) +
+        cross((7.2, 3.5, 10), (8.8, 8.5, 12), 'y', 0.35, gm.RUBBER, tex=B, rotation=((8, 8.5, 11), 'x', -22.5)) +
+        cyl16('z', (8, 9.2, 14.5), 0.4, 3, gm.STEEL, tex=B, sides=8) + rbox((7.4, 6.5, 15.2), (8.6, 9.6, 16), 'y', 0.35, gm.STEEL, tex=B) +
+        rbox((7.2, 11, 7), (8.8, 12.6, 10), 'z', 0.4, DARKCHROME, tex=C) + [e((7.45, 11.35, 6.95), (8.55, 12.35, 7.0), VISOR, 'c'),
+         e((7.9, 11.7, 6.9), (8.1, 11.9, 6.95), gm.G_PINK)] + cyl16('x', (8, 8.15, 8.75), 0.35, 2, DARKCHROME, tex=C, sides=8),
+    'shotgun':
+        cyl16('z', (8, 10.5, 6), 0.72, 12, DARKCHROME, tex=C) + cyl16('z', (8, 10.5, 0.1), 0.5, 0.25, gm.RUBBER, tex=B, sides=8) +
+        cyl16('z', (8, 9.0, 5.75), 0.6, 8.5, GUNMETAL, tex=C) +
+        cyl16('z', (8, 9.0, 4.5), 0.95, 4, gm.RUBBER, tex=B) +
+        [x for z in (3.0, 3.8, 4.6, 5.4, 6.2) for x in cyl16('z', (8, 9.0, z), 1.0, 0.25, gm.CARBON, tex=B, sides=8)] +
+        rbox((6.9, 8.2, 9), (9.1, 11.4, 13.5), 'z', 0.6, gm.PANEL, tex=B) + [e((6.85, 10.6, 9.5), (6.9, 11.0, 13), gm.HAZARD)] +
+        rbox((7.2, 6.5, 13.5), (8.8, 10.5, 16), 'z', 0.5, gm.CARBON, tex=B) +
+        cross((7.3, 5.0, 11), (8.7, 8.4, 13), 'y', 0.3, gm.RUBBER, tex=B, rotation=((8, 8.2, 12), 'x', -22.5)) +
+        cyl16('y', (8, 11.45, 0.85), 0.3, 0.5, gm.CHROME, tex=B, sides=8) + [e((9.1, 9.0, 10), (9.15, 9.6, 12.5), gm.G_RED)] +
+        rbox((7.0, 11.4, 9.5), (9.0, 11.8, 13), 'z', 0.18, DARKCHROME, tex=C),
+    'tech_rifle':
+        rbox((6.9, 8.8, 2), (9.1, 11.2, 15), 'z', 0.7, WHITE, tex=C) +
+        [e((6.85, 9.4, 4), (6.9, 10.6, 13), CIRCUIT, 'c'), e((9.1, 9.4, 4), (9.15, 10.6, 13), CIRCUIT, 'c')] +
+        cyl16('z', (8, 11.4, 4.5), 0.35, 9, DARKCHROME, tex=C, sides=8) + cyl16('z', (8, 8.6, 4.5), 0.35, 9, DARKCHROME, tex=C, sides=8) +
+        cyl16('z', (8, 10.0, 1.0), 0.55, 2, gm.CHROME, tex=B) +
+        [x for z in (0.85, 2.85, 4.85, 6.85) for x in cyl16('z', (8, 10.0, z), 1.75, 0.5, gm.G_CYAN, tex=B)] +
+        cyl16('z', (8, 12.2, 8.5), 0.65, 5, DARKCHROME, tex=C) + cyl16('z', (8, 12.2, 5.95), 0.5, 0.1, gm.LENS, tex=B) +
+        cyl16('y', (8, 11.75, 7.0), 0.25, 0.6, DARKCHROME, tex=C, sides=8) + cyl16('y', (8, 11.75, 10.0), 0.25, 0.6, DARKCHROME, tex=C, sides=8) +
+        rbox((7.3, 7.0, 13), (8.7, 10.8, 16), 'z', 0.5, WHITE, tex=C) +
+        cross((7.4, 4.8, 11.2), (8.6, 8.8, 13), 'y', 0.3, gm.RUBBER, tex=B, rotation=((8, 8.8, 12), 'x', -22.5)) +
+        rbox((7.4, 5.8, 8.5), (8.6, 8.8, 10.5), 'y', 0.35, GUNMETAL, tex=C) + [e((8.6, 6.4, 9.0), (8.65, 8.2, 10.0), gm.G_CYAN)],
 }
 
 
@@ -75,22 +83,23 @@ def write_item(name, elements, display):
 
 
 # ammo box
-AMMO = [e((4, 0, 5), (12, 6, 11), GUNMETAL, 'c'), e((3.8, 4, 4.8), (12.2, 5, 11.2), gm.HAZARD),
-        *[e((5 + i * 1.6, 6, 6.5), (6 + i * 1.6, 8.5, 7.5), gm.GOLD) for i in range(4)],
-        *[e((5 + i * 1.6, 8.5, 6.6), (6 + i * 1.6, 9.2, 7.4), gm.CHROME) for i in range(4)]]
+AMMO = rbox((4, 0, 5), (12, 6, 11), 'y', 0.8, GUNMETAL, tex=C) + rbox((3.8, 4, 4.8), (12.2, 5, 11.2), 'y', 0.9, gm.HAZARD, tex=B) + \
+       [x for i in range(4) for x in cyl16('y', (5.5 + i * 1.6, 7.25, 7), 0.55, 2.5, gm.GOLD, tex=B, sides=8)] + \
+       [x for i in range(4) for x in cyl16('y', (5.5 + i * 1.6, 8.8, 7), 0.42, 0.6, gm.CHROME, tex=B, sides=8)]
 
 # projectile launcher implant (item)
-PLS = [e((4, 1, 3), (12, 7, 13), gm.PANEL), e((3.8, 2, 2.8), (12.2, 3, 13.2), gm.HAZARD),
-       *[e((x, y, 1), (x + 2.2, y + 2.2, 13), DARKCHROME, 'c') for x in (4.6, 9.2) for y in (7, 9.6)],
-       *[e((x + 0.5, y + 0.5, 0.9), (x + 1.7, y + 1.7, 1.0), gm.G_RED) for x in (4.6, 9.2) for y in (7, 9.6)],
-       e((7, 7, 5), (9, 12, 11), SERVO, 'c')]
+PLS = rbox((4, 1, 3), (12, 7, 13), 'z', 1.2, gm.PANEL, tex=B) + rbox((3.8, 2, 2.8), (12.2, 3, 13.2), 'z', 1.25, gm.HAZARD, tex=B) + \
+      [x for cx in (5.7, 10.3) for cy in (8.1, 10.7) for x in cyl16('z', (cx, cy, 7), 1.15, 12, DARKCHROME, tex=C)] + \
+      [x for cx in (5.7, 10.3) for cy in (8.1, 10.7) for x in cyl16('z', (cx, cy, 0.95), 0.6, 0.1, gm.G_RED, tex=B, sides=8)] + \
+      cyl16('z', (8, 9.4, 8), 1.5, 6, SERVO, tex=C)
 
 # micro-missile runtime model (entity space: Y up, nose toward +Z)
 MISSILE = {"parts": {"root": [group((0, 0, 0), [
-    cube((-0.8, -0.8, -3), (0.8, 0.8, 3), WHITE), cube((-0.85, -0.85, 0.5), (0.85, 0.85, 1.2), RED_ARMOR),
-    cube((-0.6, -0.6, 3), (0.6, 0.6, 4.2), RED_ARMOR), cube((-0.3, -0.3, 4.2), (0.3, 0.3, 4.8), DARKCHROME),
+    cyl((-0.8, -0.8, -3), (0.8, 0.8, 3), 'z', WHITE), cyl((-0.85, -0.85, 0.5), (0.85, 0.85, 1.2), 'z', RED_ARMOR),
+    cyl((-0.65, -0.65, 3), (0.65, 0.65, 4.0), 'z', RED_ARMOR), cyl((-0.4, -0.4, 4.0), (0.4, 0.4, 4.6), 'z', RED_ARMOR),
+    cyl((-0.18, -0.18, 4.6), (0.18, 0.18, 5.0), 'z', DARKCHROME),
     cube((-2.0, -0.1, -3), (2.0, 0.1, -1.2), GUNMETAL), cube((-0.1, -2.0, -3), (0.1, 2.0, -1.2), GUNMETAL),
-    cube((-0.55, -0.55, -3.5), (0.55, 0.55, -3.0), G_ORANGE, glow='steady'),
+    cyl((-0.6, -0.6, -3.5), (0.6, 0.6, -3.0), 'z', G_ORANGE, glow='steady'),
 ])]}}
 
 if __name__ == '__main__':

@@ -29,6 +29,9 @@ public final class GunHud {
         g.drawString(mc.font, "/ " + gun.spec.mag + "  +" + (mc.player.getAbilities().instabuild ? "∞" : String.valueOf(reserve)), x + 26, y + 4, 0xFF8A8F98, false);
         long until = GunItem.reloadUntil(s);
         long now = mc.player.level().getGameTime();
+        if (until <= now && ammo <= gun.spec.mag / 4)
+            g.drawString(mc.font, Component.translatable("hud.edgerunners.reload_hint",
+                    com.edgefan.edgerunners.client.KeyBinds.RELOAD.getTranslatedKeyMessage()), x, y + 13, ammo == 0 ? 0xFFFF2A6D : 0xFFFCEE0A, false);
         if (until > now) {
             float p = 1f - Mth.clamp((until - now - partialTick) / gun.spec.reload, 0f, 1f);
             g.drawString(mc.font, Component.translatable("hud.edgerunners.reloading"), x, y + 13, 0xFFFCEE0A, false);

@@ -192,7 +192,11 @@ public final class ChromeRenderer {
             float bright = glowPass ? sig.glow(c.glow()) : 1f;
             if (glowPass && bright <= 0.02f) continue;
             float[] tint = c.paint() ? sig.paint() : null;
-            if (tint != null)
+            if (c.cylAxis() >= 0) {
+                float cr = tint != null ? tint[0] : bright, cg = tint != null ? tint[1] : bright, cb = tint != null ? tint[2] : bright;
+                CyberwareLayer.drawCylinder(pose, vc, c.x0(), c.y0(), c.z0(), c.x1(), c.y1(), c.z1(), c.cylAxis(), c.mat(), cr, cg, cb,
+                        glowPass ? LightTexture.FULL_BRIGHT : light);
+            } else if (tint != null)
                 CyberwareLayer.drawBox(pose, vc, c.x0(), c.y0(), c.z0(), c.x1(), c.y1(), c.z1(), c.mat(), tint[0], tint[1], tint[2], light);
             else
                 CyberwareLayer.drawBox(pose, vc, c.x0(), c.y0(), c.z0(), c.x1(), c.y1(), c.z1(), c.mat(), bright,

@@ -125,6 +125,13 @@ public class GunItem extends Item {
         level.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 0.8f, 1.3f);
     }
 
+    /** Reload key / sneak + right-click. */
+    public void reload(ServerPlayer p, ItemStack stack) {
+        if (p.isUsingItem()) p.stopUsingItem();
+        if (!startReload(p, stack) && ammo(stack) >= spec.mag)
+            p.displayClientMessage(Component.translatable("msg.edgerunners.mag_full").withStyle(ChatFormatting.GRAY), true);
+    }
+
     private boolean startReload(ServerPlayer p, ItemStack stack) {
         if (ammo(stack) >= spec.mag || reloadUntil(stack) > 0) return false;
         if (!p.getAbilities().instabuild && countAmmo(p) == 0) {

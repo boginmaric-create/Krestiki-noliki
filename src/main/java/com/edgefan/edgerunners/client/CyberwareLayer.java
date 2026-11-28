@@ -68,12 +68,12 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         VertexConsumer vc = buffers.getBuffer(RenderType.entityCutoutNoCull(ATLAS));
         if (has(data, Cyberware.SANDEVISTAN)) {
             Part p = new Part(pose, m.body);
-            cube(p, vc, -0.6f, 0.3f, 2.0f, 0.6f, 11.7f, 2.9f, CHROME, light);
-            cube(p, vc, -1.9f, 0.4f, 2.0f, -1.3f, 11.6f, 2.6f, RUBBER, light);
-            cube(p, vc, 1.3f, 0.4f, 2.0f, 1.9f, 11.6f, 2.6f, RUBBER, light);
+            cyl(p, vc, -0.6f, 0.3f, 2.0f, 0.6f, 11.7f, 2.9f, 1, CHROME, 1f, light);
+            cyl(p, vc, -1.9f, 0.4f, 2.0f, -1.3f, 11.6f, 2.6f, 1, RUBBER, 1f, light);
+            cyl(p, vc, 1.3f, 0.4f, 2.0f, 1.9f, 11.6f, 2.6f, 1, RUBBER, 1f, light);
             for (int i = 0; i < 5; i++) {
                 float y = 0.8f + i * 2.2f;
-                cube(p, vc, -2.2f, y, 2.0f, 2.2f, y + 1.2f, 3.3f, STEEL, light);
+                cyl(p, vc, -2.2f, y, 1.6f, 2.2f, y + 1.2f, 3.5f, 1, STEEL, 1f, light);
                 cube(p, vc, -0.5f, y + 0.2f, 3.3f, 0.5f, y + 1.0f, 4.0f, PANEL, light);
             }
             cube(p, vc, -1.5f, -0.2f, 1.9f, 1.5f, 0.5f, 3.0f, GOLD, light);
@@ -88,7 +88,7 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                 cube(p, vc, x0 - 0.55f, 6f, 2.5f, x1 + 0.55f, 9.5f, 2.8f, CARBON, light);
                 cube(p, vc, x0 - 0.3f, 9.2f, -2.9f, x1 + 0.3f, 10.6f, -2.5f, PANEL, light);
                 float px = arm == m.rightArm ? x0 - 0.9f : x1 + 0.5f;
-                cube(p, vc, px, 5.5f, -0.4f, px + 0.4f, 9f, 0.4f, CHROME, light);
+                cyl(p, vc, px - 0.1f, 5.5f, -0.5f, px + 0.5f, 9f, 0.5f, 1, CHROME, 1f, light);
                 p.end();
             }
         }
@@ -96,21 +96,21 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
             Part r = new Part(pose, m.rightArm);
             cube(r, vc, -4.3f, 3.5f, -2.6f, -3.0f, 9.0f, 2.6f, PANEL, light);
             cube(r, vc, -4.35f, 4.0f, -2.65f, -3.0f, 4.6f, 2.65f, HAZARD, light);
-            for (float z : new float[]{-1.8f, 0.4f}) cube(r, vc, -5.4f, 4.6f, z, -4.3f, 9.4f, z + 1.4f, CHROME, light);
+            for (float z : new float[]{-1.8f, 0.4f}) cyl(r, vc, -5.5f, 4.6f, z, -4.2f, 9.4f, z + 1.4f, 1, CHROME, 1f, light);
             r.end();
         }
         if (has(data, Cyberware.MONOWIRE)) {
             Part r = new Part(pose, m.rightArm);
-            cube(r, vc, -3.4f, 8.4f, -2.4f, w - 3f + 0.4f, 9.6f, 2.4f, PANEL, light);
-            cube(r, vc, -3.45f, 8.8f, -2.45f, w - 3f + 0.45f, 9.2f, 2.45f, HAZARD, light);
+            cyl(r, vc, -3.6f, 8.4f, -2.7f, w - 3f + 0.6f, 9.6f, 2.7f, 1, PANEL, 1f, light);
+            cyl(r, vc, -3.7f, 8.8f, -2.8f, w - 3f + 0.7f, 9.2f, 2.8f, 1, HAZARD, 1f, light);
             r.end();
         }
         if (has(data, Cyberware.REINFORCED_TENDONS)) {
             for (ModelPart leg : new ModelPart[]{m.rightLeg, m.leftLeg}) {
                 Part p = new Part(pose, leg);
-                cube(p, vc, -2.4f, 4.5f, -2.4f, 2.4f, 6.5f, 2.4f, STEEL, light);
+                cyl(p, vc, -2.8f, 4.5f, -2.8f, 2.8f, 6.5f, 2.8f, 1, STEEL, 1f, light);
                 cube(p, vc, -1.2f, 1.5f, -2.35f, 1.2f, 9.5f, -2.05f, MUSCLE, light);
-                cube(p, vc, -0.4f, 7f, 2.05f, 0.4f, 11.5f, 2.5f, CHROME, light);
+                cyl(p, vc, -0.4f, 7f, 2.05f, 0.4f, 11.5f, 2.85f, 1, CHROME, 1f, light);
                 p.end();
             }
         }
@@ -127,7 +127,7 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
                 cubeA(p, glow, -2.8f, y, 2.3f, -2.2f, y + 1f, 3.0f, mat, pulse, fb);
                 cubeA(p, glow, 2.2f, y, 2.3f, 2.8f, y + 1f, 3.0f, mat, pulse, fb);
             }
-            cubeA(p, glow, -0.25f, 0.5f, 2.9f, 0.25f, 11.5f, 3.05f, G_GREEN, pulse, fb);
+            drawCylinder(p.pose(), glow, -0.3f, 0.5f, 2.75f, 0.3f, 11.5f, 3.2f, 1, G_GREEN, pulse, pulse, pulse, fb);
             p.end();
         }
         if (has(data, Cyberware.KIROSHI_OPTICS)) {
@@ -212,6 +212,68 @@ public class CyberwareLayer extends RenderLayer<AbstractClientPlayer, PlayerMode
         face(vc, m, n, r, g, b, light, 1, 0, 0, u0, v0, dz, dy, x1, y0, z0, x1, y0, z1, x1, y1, z1, x1, y1, z0);
         face(vc, m, n, r, g, b, light, 0, -1, 0, u0, v0, dx, dz, x0, y0, z0, x0, y0, z1, x1, y0, z1, x1, y0, z0);
         face(vc, m, n, r, g, b, light, 0, 1, 0, u0, v0, dx, dz, x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1);
+    }
+
+    /**
+     * Cylinder (16-sided prism) inscribed in the given box, along axis 0 = X, 1 = Y, 2 = Z.
+     * Non-square cross-sections give an elliptic tube. Texture: the side wraps once around the tile.
+     */
+    public static void drawCylinder(PoseStack pose, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1,
+                                    int axis, int mat, float r, float g, float b, int light) {
+        PoseStack.Pose last = pose.last();
+        Matrix4f m = last.pose();
+        Matrix3f n = last.normal();
+        float u0 = (mat % 4) * 0.25f, v0 = (mat / 4) * 0.25f;
+        float[] lo = {x0 / 16, y0 / 16, z0 / 16}, hi = {x1 / 16, y1 / 16, z1 / 16};
+        int a = (axis + 1) % 3, c = (axis + 2) % 3; // the two cross-section axes
+        float ca = (lo[a] + hi[a]) / 2, cc = (lo[c] + hi[c]) / 2, ra = (hi[a] - lo[a]) / 2, rc = (hi[c] - lo[c]) / 2;
+        int segs = 16;
+        float[] p = new float[3];
+        for (int i = 0; i < segs; i++) {
+            double t0 = Math.PI * 2 * i / segs, t1 = Math.PI * 2 * (i + 1) / segs;
+            float a0 = ca + (float) Math.cos(t0) * ra, c0 = cc + (float) Math.sin(t0) * rc;
+            float a1 = ca + (float) Math.cos(t1) * ra, c1 = cc + (float) Math.sin(t1) * rc;
+            float nm = (float) ((t0 + t1) / 2);
+            float[] nrm = new float[3];
+            nrm[a] = (float) Math.cos(nm); nrm[c] = (float) Math.sin(nm);
+            float us = u0 + 0.25f * i / segs, ue = u0 + 0.25f * (i + 1) / segs;
+            float[][] q = new float[4][3];
+            q[0][axis] = lo[axis]; q[0][a] = a0; q[0][c] = c0;
+            q[1][axis] = lo[axis]; q[1][a] = a1; q[1][c] = c1;
+            q[2][axis] = hi[axis]; q[2][a] = a1; q[2][c] = c1;
+            q[3][axis] = hi[axis]; q[3][a] = a0; q[3][c] = c0;
+            float[][] uv = {{us, v0}, {ue, v0}, {ue, v0 + 0.25f}, {us, v0 + 0.25f}};
+            emitQuad(vc, m, n, q, uv, nrm, r, g, b, light);
+            // end caps (fan as degenerate quads)
+            for (int end = 0; end < 2; end++) {
+                float ax = end == 0 ? lo[axis] : hi[axis];
+                float[][] cap = new float[4][3];
+                cap[0][axis] = ax; cap[0][a] = ca; cap[0][c] = cc;
+                cap[1][axis] = ax; cap[1][a] = a0; cap[1][c] = c0;
+                cap[2][axis] = ax; cap[2][a] = a1; cap[2][c] = c1;
+                cap[3] = cap[2];
+                float cu = u0 + 0.125f, cv = v0 + 0.125f;
+                float[][] cuv = {{cu, cv}, {cu + (float) Math.cos(t0) * 0.12f, cv + (float) Math.sin(t0) * 0.12f},
+                        {cu + (float) Math.cos(t1) * 0.12f, cv + (float) Math.sin(t1) * 0.12f}, {cu + (float) Math.cos(t1) * 0.12f, cv + (float) Math.sin(t1) * 0.12f}};
+                float[] cn = new float[3];
+                cn[axis] = end == 0 ? -1 : 1;
+                emitQuad(vc, m, n, cap, cuv, cn, r, g, b, light);
+            }
+        }
+    }
+
+    private static void emitQuad(VertexConsumer vc, Matrix4f m, Matrix3f n, float[][] q, float[][] uv, float[] nrm,
+                                 float r, float g, float b, int light) {
+        for (int k = 0; k < 8; k++) { // both windings
+            int i = k < 4 ? k : 7 - k;
+            vc.vertex(m, q[i][0], q[i][1], q[i][2]).color(r, g, b, 1f).uv(uv[i][0], uv[i][1])
+                    .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(n, nrm[0], nrm[1], nrm[2]).endVertex();
+        }
+    }
+
+    /** Cylinder helper for this layer's own parts. */
+    private static void cyl(Part p, VertexConsumer vc, float x0, float y0, float z0, float x1, float y1, float z1, int axis, int mat, float bright, int light) {
+        drawCylinder(p.pose(), vc, x0, y0, z0, x1, y1, z1, axis, mat, bright, bright, bright, light);
     }
 
     /** One textured face. The tile covers 4x4 model pixels; smaller faces use a matching part of it. */

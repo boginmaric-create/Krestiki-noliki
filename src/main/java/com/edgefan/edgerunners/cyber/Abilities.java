@@ -35,6 +35,7 @@ public final class Abilities {
     public static final int HORN = 4;
     public static final int LAUNCH = 5;
     public static final int HERO = 6;
+    public static final int RELOAD = 7;
 
     public static final double SANDE_RADIUS = 24;
 
@@ -53,6 +54,10 @@ public final class Abilities {
             case DOUBLE_JUMP -> doubleJump(p);
             case LAUNCH -> launch(p);
             case HERO -> heroAbility(p);
+            case RELOAD -> {
+                var stack = p.getMainHandItem();
+                if (stack.getItem() instanceof com.edgefan.edgerunners.weapon.GunItem gun) gun.reload(p, stack);
+            }
             case HORN -> { if (p.getVehicle() instanceof com.edgefan.edgerunners.vehicle.VehicleEntity v) v.honk(); }
             default -> {}
         }

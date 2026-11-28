@@ -4,7 +4,7 @@
   "item.edgerunners.sandevistan": "Сандевистан",
   "item.edgerunners.sandevistan.desc": "Имплант позвоночника. [V] — замедляет мир вокруг на 6 с.",
   "item.edgerunners.monowire": "Моноструна",
-  "item.edgerunners.monowire.desc": "Струна-лезвие в запястье. [R] — хлестнуть всех перед собой.",
+  "item.edgerunners.monowire.desc": "Струна-лезвие в запястье. [X] — хлестнуть всех перед собой.",
   "item.edgerunners.kiroshi_optics": "Оптика Kiroshi",
   "item.edgerunners.kiroshi_optics.desc": "Кибер-глаза. [B] — подсветить всех живых в радиусе 40 блоков, ночное зрение.",
   "item.edgerunners.reinforced_tendons": "Усиленные сухожилия",
@@ -101,7 +101,7 @@
   "item.edgerunners.tech_rifle": "Тех-винтовка",
   "item.edgerunners.tech_rifle.desc": "Электромагнитная винтовка: пуля прошивает всех на линии огня.",
   "tooltip.edgerunners.gun_stats": "Урон %s | Магазин %s | %s выстр./с",
-  "tooltip.edgerunners.gun_controls": "ПКМ — огонь, Shift+ПКМ — перезарядка, нужны патроны",
+  "tooltip.edgerunners.gun_controls": "ПКМ — огонь, [R] — перезарядка (или Shift+ПКМ), нужны патроны",
   "item.edgerunners.projectile_launcher": "Ракетная установка",
   "item.edgerunners.projectile_launcher.desc": "Пусковой модуль в предплечье. [G] — две самонаводящиеся микроракеты.",
   "key.edgerunners.launch": "Ракетная установка",
@@ -140,5 +140,8 @@
   "item.edgerunners.persona_gunner_girl": "Чип личности: Стрелок",
   "item.edgerunners.persona_veteran_borg": "Чип личности: Ветеран-борг",
   "item.edgerunners.persona_chrome_tyrant": "Чип личности: Хромированный тиран",
-  "entity.edgerunners.missile": "Микроракета"
+  "entity.edgerunners.missile": "Микроракета",
+  "key.edgerunners.reload": "Перезарядка оружия",
+  "msg.edgerunners.mag_full": "Магазин полон",
+  "hud.edgerunners.reload_hint": "[%s] перезарядка"
 }

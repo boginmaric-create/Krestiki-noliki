@@ -37,6 +37,65 @@ def box(fr, to, mat, glow=None):
     return e
 
 
+_PLANE = {'x': (1, 2), 'y': (0, 2), 'z': (0, 1)}
+_AX = {'x': 0, 'y': 1, 'z': 2}
+
+
+def _tex(els, tex):
+    if tex:
+        for e in els:
+            for f in e['faces'].values(): f['texture'] = tex
+    return els
+
+
+def cyl16(axis, c, r, length, mat, glow=None, tex=None, sides=16):
+    """Round prism along `axis` centred at c: 8 thin slabs at 22.5 degree steps (16 sides), or 4 slabs for sides=8.
+    Only uses rotations block models allow (0, +-22.5, +-45)."""
+    i, j = _PLANE[axis]
+    k = _AX[axis]
+    s = 2 * r * math.tan(math.pi / sides) * 1.08
+    variants = [(False, 0), (False, 45), (True, 0), (True, 45)] if sides == 8 else \
+               [(False, 0), (False, 22.5), (False, 45), (False, -22.5), (True, 0), (True, 22.5), (True, 45), (True, -22.5)]
+    els = []
+    for swapped, ang in variants:
+        da, db = (s / 2, r) if swapped else (r, s / 2)
+        fr, to = [0, 0, 0], [0, 0, 0]
+        fr[k], to[k] = c[k] - length / 2, c[k] + length / 2
+        fr[i], to[i] = c[i] - da, c[i] + da
+        fr[j], to[j] = c[j] - db, c[j] + db
+        e = box([round(v, 3) for v in fr], [round(v, 3) for v in to], mat, glow)
+        if ang:
+            e['rotation'] = {"origin": [round(v, 3) for v in c], "axis": axis, "angle": ang}
+        els.append(e)
+    return _tex(els, tex)
+
+
+def rbox(fr, to, axis, rad, mat, glow=None, tex=None):
+    """Box with rounded edges running along `axis` (a rounded-rectangle prism)."""
+    i, j = _PLANE[axis]
+    k = _AX[axis]
+    rad = min(rad, (to[i] - fr[i]) / 2 - 0.01, (to[j] - fr[j]) / 2 - 0.01)
+    b1 = [list(fr), list(to)]; b1[0][i] += rad; b1[1][i] -= rad
+    b2 = [list(fr), list(to)]; b2[0][j] += rad; b2[1][j] -= rad
+    els = [box(b1[0], b1[1], mat, glow), box(b2[0], b2[1], mat, glow)]
+    for ci in (fr[i] + rad, to[i] - rad):
+        for cj in (fr[j] + rad, to[j] - rad):
+            c = [0, 0, 0]; c[k] = (fr[k] + to[k]) / 2; c[i] = ci; c[j] = cj
+            els += cyl16(axis, c, rad, to[k] - fr[k], mat, glow, sides=8)
+    return _tex(els, tex)
+
+
+def cross(fr, to, axis, inset, mat, glow=None, tex=None, rotation=None):
+    """Cheap bevel: two overlapping boxes (works together with a rotation, unlike rbox)."""
+    i, j = _PLANE[axis]
+    b1 = [list(fr), list(to)]; b1[0][i] += inset; b1[1][i] -= inset
+    b2 = [list(fr), list(to)]; b2[0][j] += inset; b2[1][j] -= inset
+    els = [box(b1[0], b1[1], mat, glow), box(b2[0], b2[1], mat, glow)]
+    if rotation:
+        for e in els: e['rotation'] = {"origin": list(rotation[0]), "axis": rotation[1], "angle": rotation[2]}
+    return _tex(els, tex)
+
+
 def rot(e, angle, origin, axis='x'):
     e['rotation'] = {"origin": list(origin), "axis": axis, "angle": angle}
     return e
@@ -57,132 +116,101 @@ def path(points, size, mat, steps=4):
 M = {}
 
 # ---------------------------------------------------------------- Mantis blade
-mb = [
-    box([5.5, 0, 5.5], [10.5, 5, 10.5], PANEL),
-    box([5, 0.5, 6], [5.5, 4.5, 10], STEEL), box([10.5, 0.5, 6], [11, 4.5, 10], STEEL),
-    box([6, 1, 5], [10, 2, 5.5], HAZARD), box([6.5, 2.5, 5.1], [9.5, 4.5, 5.5], CARBON),
-    box([6.5, 5, 7], [9.5, 7, 9], CHROME), box([5.8, 5.5, 7.5], [10.2, 6.5, 8.5], STEEL),
-    box([7.4, 4, 9.3], [8.6, 6.5, 10.5], PANEL), box([7.6, 6.5, 9.6], [8.4, 9, 10.2], CHROME),
-    # three folding blade segments, each a little thinner
+mb = cyl16('y', (8, 2.5, 8), 2.6, 5, PANEL) + cyl16('y', (8, 1.5, 8), 2.75, 1, HAZARD) + \
+     cyl16('x', (8, 6, 8), 1.1, 4.4, CHROME) + cyl16('x', (8, 6, 8), 0.5, 4.8, STEEL) + \
+     cyl16('y', (8, 7.0, 9.9), 0.45, 4.5, CHROME, sides=8) + [
     box([7.5, 7, 6], [8.5, 12, 10], STEEL),
     box([7.55, 12, 6.3], [8.45, 17, 10], STEEL),
     box([7.6, 17, 6.8], [8.4, 21, 10], CHROME),
     rot(box([7.62, 20, 7.4], [8.38, 23.5, 9.6], CHROME), 22.5, (8, 21, 8.5)),
-    # glowing cutting edge + chrome bevel
     box([7.8, 7.5, 10], [8.2, 21, 10.25], CHROME),
     box([7.85, 8, 10.25], [8.15, 21, 10.6], G_PINK),
     rot(box([7.85, 20.5, 9.5], [8.15, 23, 9.8], G_PINK), 22.5, (8, 21, 8.5)),
-    # spine with serrations
     box([7.45, 7, 5.6], [8.55, 19, 6.1], PANEL),
-    # segment joints
-    box([8.45, 11.8, 7.2], [8.6, 12.2, 9.4], G_CYAN), box([7.4, 11.8, 7.2], [7.55, 12.2, 9.4], G_CYAN),
-    box([8.4, 16.8, 7.4], [8.55, 17.2, 9.4], G_CYAN), box([7.45, 16.8, 7.4], [7.6, 17.2, 9.4], G_CYAN),
-]
+] + cyl16('x', (8, 12, 8.3), 0.6, 1.3, G_CYAN, sides=8) + cyl16('x', (8, 17, 8.4), 0.55, 1.2, G_CYAN, sides=8)
 for y in range(8, 19, 2):
     mb.append(box([7.55, y, 5.2], [8.45, y + 0.8, 5.6], STEEL))
 M['mantis_blade'] = mb
 
 # ---------------------------------------------------------------- Sandevistan
-s = [box([7.25, 0, 7.25], [8.75, 16, 8.75], CHROME),
-     box([6, 0, 10.5], [6.8, 16, 11.3], RUBBER), box([9.2, 0, 10.5], [10, 16, 11.3], RUBBER),
-     box([7.7, 0, 11.6], [8.3, 16, 12.0], G_GREEN),
-     box([6, 15.6, 6.5], [10, 16.6, 9.5], GOLD)]
+s = cyl16('y', (8, 8, 8), 0.8, 16, CHROME) + cyl16('y', (6.4, 8, 10.9), 0.45, 16, RUBBER, sides=8) + \
+    cyl16('y', (9.6, 8, 10.9), 0.45, 16, RUBBER, sides=8) + cyl16('y', (8, 8, 11.8), 0.3, 16, G_GREEN, sides=8) + \
+    cyl16('y', (8, 16.1, 8), 1.6, 1, GOLD)
 for i in range(6):
     y = 0.4 + i * 2.6
     nodes = G_GREEN if i % 2 == 0 else G_CYAN
-    s += [box([5, y, 6], [11, y + 1.6, 10], STEEL),
-          box([5.3, y + 1.6, 6.3], [10.7, y + 1.85, 9.7], PANEL),
-          box([7.3, y + 0.2, 10], [8.7, y + 1.4, 12.4], PANEL),
-          box([3.5, y + 0.4, 7.3], [5, y + 1.2, 8.7], STEEL), box([11, y + 0.4, 7.3], [12.5, y + 1.2, 8.7], STEEL),
-          box([3, y + 0.45, 7.5], [3.5, y + 1.15, 8.5], nodes), box([12.5, y + 0.45, 7.5], [13, y + 1.15, 8.5], nodes),
-          box([7, y + 0.45, 5.6], [9, y + 1.15, 6], G_GREEN)]
+    s += rbox([5, y, 6], [11, y + 1.6, 10], 'y', 1.2, STEEL)
+    s += [box([5.3, y + 1.6, 6.3], [10.7, y + 1.85, 9.7], PANEL)]
+    s += rbox([7.3, y + 0.2, 10], [8.7, y + 1.4, 12.4], 'y', 0.5, PANEL)
+    s += cyl16('x', (4.25, y + 0.8, 8), 0.45, 1.5, STEEL, sides=8) + cyl16('x', (11.75, y + 0.8, 8), 0.45, 1.5, STEEL, sides=8)
+    s += cyl16('x', (3.25, y + 0.8, 8), 0.5, 0.5, nodes, sides=8) + cyl16('x', (12.75, y + 0.8, 8), 0.5, 0.5, nodes, sides=8)
+    s += [box([7, y + 0.45, 5.6], [9, y + 1.15, 6], G_GREEN)]
 M['sandevistan'] = s
 
-# ---------------------------------------------------------------- Kiroshi optics
-M['kiroshi_optics'] = [
-    box([4, 4, 6], [12, 12, 11], PANEL),
-    box([3.5, 4.5, 5], [4.5, 11.5, 10], STEEL), box([11.5, 4.5, 5], [12.5, 11.5, 10], STEEL),
-    box([4.5, 11.5, 5], [11.5, 12.5, 10], STEEL), box([4.5, 3.5, 5], [11.5, 4.5, 10], STEEL),
-    box([4.5, 4.5, 5], [11.5, 11.5, 5.6], CHROME),
-    box([5.2, 5.2, 4.8], [10.8, 10.8, 5], RUBBER),
-    box([5.8, 5.8, 4.6], [10.2, 10.2, 4.8], G_RED),
-    box([6.4, 6.4, 4.4], [9.6, 9.6, 4.6], LENS),
-    box([7.3, 7.3, 4.2], [8.7, 8.7, 4.4], RUBBER),
-    box([8.8, 8.8, 4.15], [9.3, 9.3, 4.25], CERAMIC, glow=True),
-    box([5, 12.5, 6], [11, 13, 10], CERAMIC),
-    box([7, 7, 11], [9, 9, 14.2], RUBBER), box([6.6, 6.6, 14.2], [9.4, 9.4, 15.2], GOLD),
-    box([3, 6.5, 6.5], [3.5, 9.5, 9.5], CARBON), box([12.5, 6.5, 6.5], [13, 9.5, 9.5], CARBON),
-]
+# ---------------------------------------------------------------- Kiroshi optics (round cyber-eye)
+M['kiroshi_optics'] = cyl16('z', (8, 8, 8.5), 4.0, 5, PANEL) + cyl16('z', (8, 8, 5.7), 3.7, 0.8, CHROME) + \
+    cyl16('z', (8, 8, 5.2), 3.1, 0.4, RUBBER) + cyl16('z', (8, 8, 4.85), 2.4, 0.3, G_RED) + \
+    cyl16('z', (8, 8, 4.6), 1.7, 0.3, LENS) + cyl16('z', (8, 8, 4.35), 0.8, 0.25, RUBBER) + \
+    [box([8.8, 8.8, 4.15], [9.3, 9.3, 4.25], CERAMIC, glow=True)] + \
+    cyl16('z', (8, 8, 12.6), 1.0, 3.2, RUBBER) + cyl16('z', (8, 8, 14.7), 1.4, 1.0, GOLD) + \
+    cyl16('x', (3.6, 8, 8.5), 1.6, 0.6, CARBON) + cyl16('x', (12.4, 8, 8.5), 1.6, 0.6, CARBON) + \
+    cyl16('z', (8, 8, 7.2), 4.2, 0.4, CERAMIC)
 
 # ---------------------------------------------------------------- Monowire
-mw = [box([4, 0, 5], [12, 5, 11], PANEL), box([5, 0, 4], [11, 5, 12], PANEL),
-      box([3.8, 1.5, 4.8], [12.2, 2.3, 11.2], HAZARD), box([4.8, 1.5, 3.8], [11.2, 2.3, 12.2], HAZARD),
-      box([3.85, 2.8, 6], [4.0, 4.5, 10], CARBON), box([12.0, 2.8, 6], [12.15, 4.5, 10], CARBON),
-      box([6.5, 5, 6.5], [9.5, 6.2, 9.5], CHROME), box([6.2, 5.5, 6.2], [9.8, 5.8, 9.8], G_PINK),
-      box([7.4, 6.2, 7.4], [8.6, 7, 8.6], STEEL)]
+mw = cyl16('y', (8, 2.5, 8), 4.0, 5, PANEL) + cyl16('y', (8, 1.9, 8), 4.2, 0.8, HAZARD) + \
+     cyl16('y', (8, 4.0, 8), 4.1, 0.4, CARBON) + cyl16('y', (8, 5.6, 8), 1.5, 1.2, CHROME) + \
+     cyl16('y', (8, 5.65, 8), 1.8, 0.3, G_PINK) + cyl16('y', (8, 6.6, 8), 0.6, 0.8, STEEL, sides=8)
 mw += path([(8, 7, 8), (8, 9, 9.5), (8, 11.5, 9.6), (8, 13.5, 8), (8.4, 14.6, 5.5), (9, 14, 3),
             (9.4, 12.5, 2), (9.6, 11, 2.4)], 0.35, G_PINK, steps=5)
-mw += [box([9.0, 9.8, 1.8], [10.2, 11.0, 3.0], CHROME), box([9.2, 9.5, 2.0], [10.0, 9.8, 2.8], G_PINK)]
+mw += cyl16('y', (9.6, 10.4, 2.4), 0.6, 1.2, CHROME, sides=8) + cyl16('y', (9.6, 9.65, 2.4), 0.4, 0.3, G_PINK, sides=8)
 M['monowire'] = mw
 
 # ---------------------------------------------------------------- Reinforced tendons
-t = [box([4, 13.5, 6], [12, 15.5, 10], STEEL), box([4, 0.5, 6], [12, 2.5, 10], STEEL),
-     box([4.4, 7.3, 6.4], [11.6, 8.5, 9.6], PANEL), box([7.5, 7.6, 6.1], [8.5, 8.2, 6.4], G_CYAN),
-     box([7, 2.5, 9.6], [9, 8, 10.6], PANEL), box([7.5, 8, 9.8], [8.5, 13.5, 10.4], CHROME)]
-for i, x in enumerate([5, 6.3, 7.6, 8.9, 10.2]):
-    z = 6.8 + (i % 2) * 0.3
-    t.append(box([x, 2.5, z], [x + 1.05, 13.5, z + 1.6], MUSCLE))
-for x in (4.8, 10.6):
-    for y in (14.9, 0.4):
-        t.append(box([x, y, 5.8], [x + 0.6, y + 0.4, 6.0], GOLD))
+t = rbox([4, 13.5, 6], [12, 15.5, 10], 'y', 1.2, STEEL) + rbox([4, 0.5, 6], [12, 2.5, 10], 'y', 1.2, STEEL) + \
+    rbox([4.4, 7.3, 6.4], [11.6, 8.5, 9.6], 'y', 1.0, PANEL) + [box([7.5, 7.6, 6.1], [8.5, 8.2, 6.4], G_CYAN)] + \
+    cyl16('y', (8, 5.25, 10.1), 0.9, 5.5, PANEL) + cyl16('y', (8, 10.75, 10.1), 0.45, 5.5, CHROME, sides=8)
+for i, x in enumerate([5.5, 6.8, 8.1, 9.4, 10.7]):
+    t += cyl16('y', (x, 8, 7.6 + (i % 2) * 0.3), 0.62, 11, MUSCLE, sides=8)
+for x in (5.1, 10.9):
+    for y in (15.1, 0.6):
+        t += cyl16('z', (x, y, 5.9), 0.3, 0.2, GOLD, sides=8)
 M['reinforced_tendons'] = t
 
-# ---------------------------------------------------------------- Gorilla arms
-g = [box([5, 0, 5], [11, 4, 11], PANEL), box([4.8, 3.2, 4.8], [11.2, 4, 11.2], HAZARD),
-     box([4, 2, 6], [4.6, 6, 6.6], CHROME), box([3.8, 1, 5.8], [4.8, 3, 6.8], PANEL),
-     box([11.4, 2, 9.4], [12, 6, 10], CHROME), box([11.2, 1, 9.2], [12.2, 3, 10.2], PANEL),
-     box([3.8, 4, 4.6], [12.2, 10, 11.4], STEEL),
-     box([4, 9, 4.2], [12, 10.4, 5], PANEL),
-     box([4.4, 5, 11.4], [11.6, 9.5, 11.8], CARBON),
-     box([12.2, 5.5, 4.8], [13.8, 9.5, 8.5], STEEL), box([11.5, 8.5, 4], [13.5, 10, 5.5], CHROME)]
+# ---------------------------------------------------------------- Gorilla arms (rounded fist)
+g = cyl16('y', (8, 2, 8), 3.0, 4, PANEL) + cyl16('y', (8, 3.6, 8), 3.15, 0.8, HAZARD) + \
+    cyl16('y', (4.3, 4, 6.3), 0.35, 4, CHROME, sides=8) + cyl16('y', (11.7, 4, 9.7), 0.35, 4, CHROME, sides=8) + \
+    rbox([3.8, 4, 4.6], [12.2, 10, 11.4], 'y', 1.4, STEEL) + rbox([4, 9, 4.2], [12, 10.4, 5], 'y', 0.35, PANEL) + \
+    [box([4.4, 5, 11.4], [11.6, 9.5, 11.8], CARBON)] + rbox([12.2, 5.5, 4.8], [13.8, 9.5, 8.5], 'y', 0.7, STEEL) + \
+    cyl16('x', (12.5, 9.25, 4.75), 0.75, 2, CHROME, sides=8)
 for i in range(4):
     x = 4 + i * 2.1
-    g += [box([x, 10, 4.6], [x + 1.9, 13, 9.5], STEEL),
-          box([x + 0.1, 10.4, 3.6], [x + 1.8, 12.8, 4.6], PANEL),
-          box([x + 0.6, 11.3, 3.4], [x + 1.3, 12, 3.6], G_CYAN),
-          box([x + 0.2, 13, 5.5], [x + 1.7, 13.4, 9], CHROME)]
+    g += rbox([x, 10, 4.6], [x + 1.9, 13, 9.5], 'z', 0.8, STEEL)
+    g += rbox([x + 0.1, 10.4, 3.6], [x + 1.8, 12.8, 4.6], 'z', 0.7, PANEL)
+    g += cyl16('z', (x + 0.95, 11.6, 3.5), 0.4, 0.2, G_CYAN, sides=8)
+    g += cyl16('x', (x + 0.95, 13.2, 7.25), 0.3, 1.5, CHROME, sides=8)
 M['gorilla_arms'] = g
 
-# ---------------------------------------------------------------- Immunosuppressant
-M['immunosuppressant'] = [
-    box([6.5, 3, 6.5], [9.5, 11, 9.5], CERAMIC),
-    box([6.3, 4.5, 7.3], [9.7, 9.5, 8.7], G_CYAN),
-    box([6.4, 9.6, 6.4], [9.6, 10.4, 9.6], REDPL),
-    box([6, 2, 6], [10, 3, 10], STEEL), box([6, 11, 6], [10, 12, 10], PANEL),
-    box([4.5, 11, 7.5], [11.5, 11.6, 8.5], PANEL),
-    box([7.5, 12, 7.5], [8.5, 14.5, 8.5], CHROME), box([6.8, 14.5, 6.8], [9.2, 15.3, 9.2], REDPL),
-    box([7, 1.4, 7], [9, 2, 9], STEEL), box([7.8, 0, 7.8], [8.2, 1.4, 8.2], CHROME),
-]
+# ---------------------------------------------------------------- Immunosuppressant (round auto-injector)
+M['immunosuppressant'] = cyl16('y', (8, 7, 8), 1.5, 8, CERAMIC) + cyl16('y', (8, 7, 8), 1.58, 4.6, G_CYAN) + \
+    cyl16('y', (8, 10, 8), 1.62, 0.8, REDPL) + cyl16('y', (8, 2.5, 8), 2.0, 1, STEEL) + cyl16('y', (8, 11.5, 8), 2.0, 1, PANEL) + \
+    rbox([4.5, 11, 7.5], [11.5, 11.6, 8.5], 'x', 0.25, PANEL) + cyl16('y', (8, 13.25, 8), 0.5, 2.5, CHROME, sides=8) + \
+    cyl16('y', (8, 14.9, 8), 1.2, 0.8, REDPL) + cyl16('y', (8, 1.7, 8), 1.0, 0.6, STEEL) + cyl16('y', (8, 0.7, 8), 0.2, 1.4, CHROME, sides=8)
 
-# ---------------------------------------------------------------- Ripperdoc kit
-rk = [box([1, 1, 4], [15, 7.8, 12], REDPL), box([1, 8.1, 4], [15, 9.6, 12], REDPL),
-      box([1.1, 7.8, 4.1], [14.9, 8.1, 11.9], PANEL),
-      box([2, 0, 5], [4, 1, 11], RUBBER), box([12, 0, 5], [14, 1, 11], RUBBER),
-      box([3, 6.5, 3.6], [5, 8.8, 4], STEEL), box([11, 6.5, 3.6], [13, 8.8, 4], STEEL),
-      box([5, 9.6, 7.5], [6, 11, 8.5], STEEL), box([10, 9.6, 7.5], [11, 11, 8.5], STEEL),
-      box([5, 11, 7.4], [11, 12, 8.6], RUBBER),
-      box([7.2, 2.2, 3.7], [8.8, 6.8, 4], CERAMIC), box([5.7, 3.7, 3.7], [10.3, 5.3, 4], CERAMIC),
-      box([13, 2, 3.7], [13.6, 2.6, 3.9], G_GREEN)]
-for x0, x1 in ((0.7, 1.8), (14.2, 15.3)):
-    for z0, z1 in ((3.7, 4.8), (11.2, 12.3)):
-        rk.append(box([x0, 1, z0], [x1, 9.6, z1], STEEL))
+# ---------------------------------------------------------------- Ripperdoc kit (rounded case)
+rk = rbox([1, 1, 4], [15, 7.8, 12], 'z', 1.2, REDPL) + rbox([1, 8.1, 4], [15, 9.6, 12], 'z', 0.7, REDPL) + \
+     [box([1.1, 7.8, 4.1], [14.9, 8.1, 11.9], PANEL)] + \
+     rbox([2, 0, 5], [4, 1, 11], 'z', 0.4, RUBBER) + rbox([12, 0, 5], [14, 1, 11], 'z', 0.4, RUBBER) + \
+     rbox([3, 6.5, 3.6], [5, 8.8, 4], 'z', 0.15, STEEL) + rbox([11, 6.5, 3.6], [13, 8.8, 4], 'z', 0.15, STEEL) + \
+     cyl16('y', (5.5, 10.3, 8), 0.5, 1.4, STEEL, sides=8) + cyl16('y', (10.5, 10.3, 8), 0.5, 1.4, STEEL, sides=8) + \
+     cyl16('x', (8, 11.5, 8), 0.7, 6.2, RUBBER) + \
+     [box([7.2, 2.2, 3.7], [8.8, 6.8, 4], CERAMIC), box([5.7, 3.7, 3.7], [10.3, 5.3, 4], CERAMIC), box([13, 2, 3.7], [13.6, 2.6, 3.9], G_GREEN)]
 M['ripperdoc_kit'] = rk
 
 # ---------------------------------------------------------------- Cyber chip
-c = [box([3, 0, 3], [13, 1, 13], PCB), box([6, 1, 6], [10, 1.8, 10], PANEL),
-     box([6.5, 1.8, 6.5], [9.5, 2.2, 9.5], CHROME), box([7.3, 2.2, 7.3], [8.7, 2.4, 8.7], G_CYAN),
-     box([4, 1, 4], [5, 1.8, 5], CHROME), box([11, 1, 11], [12, 1.8, 12], CHROME),
-     box([11, 1, 4], [12, 1.5, 5.5], RUBBER)]
+c = [box([3, 0, 3], [13, 1, 13], PCB)] + rbox([6, 1, 6], [10, 1.8, 10], 'y', 0.6, PANEL) + \
+    cyl16('y', (8, 2.0, 8), 1.6, 0.4, CHROME) + cyl16('y', (8, 2.3, 8), 0.8, 0.2, G_CYAN) + \
+    cyl16('y', (4.5, 1.4, 4.5), 0.5, 0.8, CHROME, sides=8) + cyl16('y', (11.5, 1.4, 11.5), 0.5, 0.8, CHROME, sides=8) + \
+    [box([11, 1, 4], [12, 1.5, 5.5], RUBBER)]
 for i in (4.5, 6.5, 8.5, 10.5):
     c += [box([i, 0, 1.5], [i + 1, 0.6, 3], GOLD), box([i, 0, 13], [i + 1, 0.6, 14.5], GOLD),
           box([1.5, 0, i], [3, 0.6, i + 1], GOLD), box([13, 0, i], [14.5, 0.6, i + 1], GOLD)]
@@ -234,7 +262,8 @@ if __name__ == '__main__':
             e['from'][2], e['to'][2] = 16 - e['to'][2], 16 - e['from'][2]
             if 'rotation' in e:
                 e['rotation']['origin'][2] = 16 - e['rotation']['origin'][2]
-                e['rotation']['angle'] = -e['rotation']['angle']
+                if e['rotation']['axis'] != 'z':
+                    e['rotation']['angle'] = -e['rotation']['angle']
         disp = display_for(elements)
         if name == 'cyber_chip':
             for k in ('thirdperson_righthand', 'thirdperson_lefthand', 'firstperson_righthand', 'firstperson_lefthand'):
